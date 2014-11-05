@@ -1,0 +1,14 @@
+.countries {
+	fill: #000;
+	stroke: #ccc;
+}
+
+.gratBackground {
+	fill: #05b6cd;
+}
+
+.gratLines {
+	stroke: #a1f2fd;
+	fill: rgba(0,0,0,0);
+	stroke-width: 0.5px;
+}
