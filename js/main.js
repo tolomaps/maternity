@@ -10,8 +10,9 @@ Robin Tolochko
 November 2014
 *************************************************************/
 var keyArray = ["MaternalLeave", "PaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
-var currentVariable = keyArray[0];
+var currentVariable = keyArray[2]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
 var jsonCountries;
+var colorize;
 
 //begin script when window loads 
 window.onload = initialize();
@@ -68,7 +69,8 @@ function setMap(){
 	// 	var countries = map.selectAll(".countries")
 	// 		.data(topojson.feature(countries, countries.objects.countries).features)
 	function callback(error, maternityData, countries) { //the callback function accepts an error, and then after the error, one parameter for each defer line within queue(). it accepts them in the same order that the defer lines are placed... so in this case, maternityData is written first, and then countries, so that's the order they're accepted as parameters
-		
+		var colorize = colorScale(maternityData);
+
 		//create variable for csv to json data transfer
 		var jsonCountries = countries.objects.countries.geometries;
 		//Create outer loop through csv data. Assign each country code to a variable.
@@ -105,18 +107,66 @@ function setMap(){
 			.data(topojson.feature(countries, countries.objects.countries).features) //translates data into an array of geojson features. essentially creates a for-in loop. for element in data, do this. and this is defined by everything below.
 			.enter()
 			.append("path")
-			.attr("class", function(blah) {
-				return "countries " + blah.properties.code3; 
+			.attr("class", function(d) {
+				return "countries " + d.properties.code3; 
 			})
 			.attr("d", function(d) {
 				return path(d);
 			})
 			.style("fill", function(d){
-				return "#bbb";
+				return choropleth(d, colorize);
 			})
-			.style("stroke", function(d){
-				return "#888";
-			});
 			
+	};
+};
+
+function colorScale(maternityData) {
+	//creating a variable to hold color generator
+	var color;
+	//if the data is ordinal, set color to an ordinal scale
+	//NOTE: These if-else statements aren't working: error in Firebug says TypeError: maternityData[i] is undefined - but I can't figure out why
+	if (maternityData[i][currentVariable] == "MaternalLeave" || maternityData[i][currentVariable] == "PaternalLeave") {
+		color = d3.scale.ordinal()
+		.range([
+			"#DE872C",
+			"#FFE2DF",
+			"#E5B3C3",
+			"#AD6E97",
+			"#754773",
+			"#29182B"
+		]);
+	} else { //otherwise, the data is numeric, so set color to a quantile scale
+		color = d3.scale.quantile()
+		.range([
+			"#FFE2DF",
+			"#E5B3C3",
+			"#AD6E97",
+			"#754773",
+			"#29182B"
+		]);
+	};
+
+	var currentArray = [];	
+	for (var i in maternityData) {
+		//if the data is ordinal, just add the string to the current array
+		if (maternityData[i][currentVariable] == "MaternalLeave" || maternityData[i][currentVariable] == "PaternalLeave") {
+			currentArray.push(maternityData[i][currentVariable]); 
+		} else { //else, convert data to number and add to current array
+			currentArray.push(Number(maternityData[i][currentVariable]));
+		};
+	};
+	color.domain(currentArray); //pass array of values as the domain
+	return color; //return color scale generator
+};
+
+
+function choropleth(d, colorize){
+	//get data value
+	var value = d.properties ? d.properties[currentVariable] : d[currentVariable];
+	//if the value exists, assign it a color; otherwise assign gray
+	if (value) {
+		return colorize(value);
+	} else {
+		return "#ccc";
 	};
 };
