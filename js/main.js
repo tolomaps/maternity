@@ -10,9 +10,11 @@ Robin Tolochko
 November 2014
 *************************************************************/
 var keyArray = ["MaternalLeave", "PaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
-var currentVariable = keyArray[2]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
+var currentVariable = keyArray[5]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
 var jsonCountries;
 var colorize;
+var mapWidth = 850, mapHeight = 450; //set map container dimensions
+var chartWidth = 840, chartHeight = 150; //set chart container dimensions
 
 //begin script when window loads 
 window.onload = initialize();
@@ -23,19 +25,17 @@ function initialize() {
 
 // set map parameters
 function setMap(){
-	var width = 1200;
-	var height = 600;
 
 	var map = d3.select("body")
 		.append("svg")
-		.attr("width", width)
-		.attr("height", height)
+		.attr("width", mapWidth)
+		.attr("height", mapHeight)
 		.attr("class", "map");
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
     	.scale(150)
-    	.translate([width / 2, height / 2])
+    	.translate([mapWidth / 2, mapHeight / 2])
     	.precision(.1);
 
     //Draw the SVG
@@ -43,8 +43,7 @@ function setMap(){
     	.projection(projection);
 
 	//create graticule generator
-	var graticule = d3.geo.graticule()
-		.step([20, 20]); 
+	var graticule = d3.geo.graticule(); 
 
 	//create graticule background (aka water)
 	var gratBackground = map.append("path")
@@ -69,6 +68,9 @@ function setMap(){
 	// 	var countries = map.selectAll(".countries")
 	// 		.data(topojson.feature(countries, countries.objects.countries).features)
 	function callback(error, maternityData, countries) { //the callback function accepts an error, and then after the error, one parameter for each defer line within queue(). it accepts them in the same order that the defer lines are placed... so in this case, maternityData is written first, and then countries, so that's the order they're accepted as parameters
+		// var colorize = colorScale(maternityData);
+		// console.log(colorize);
+
 		var colorize = colorScale(maternityData);
 
 		//create variable for csv to json data transfer
@@ -90,8 +92,13 @@ function setMap(){
 							var attribute = keyArray[key];
 							var value = csvCountry[attribute];
 							jsonCountries[j].properties[attribute] = value;
+						//for the Fertility Rate, round to one decimal point
+						} else if (keyArray[key] == "FertilityRate") {
+							var attribute = keyArray[key];
+							var value = Math.round(csvCountry[attribute]*10)/10;
+							jsonCountries[j].properties[attribute] = value;
 						} else {
-						//else, convert to float, round to nearest integer, and attach CSV data to json object
+						//else, round to nearest integer, and attach CSV data to json object
 							var attribute = keyArray[key];
 							var value = Math.round(parseFloat(csvCountry[attribute]));
 							jsonCountries[j].properties[attribute] = value;
@@ -114,10 +121,42 @@ function setMap(){
 				return path(d);
 			})
 			.style("fill", function(d){
-				return choropleth(d, colorize);
+				return choropleth(d, colorize); // will need to change this so that it updates dynamically depending on the currentVariable - see Carl's email
 			})
-			
+			.on("mouseover", highlight)
+			.on("mouseout", dehighlight)
+			.on("mousemove", moveLabel)
+			.append("desc")
+				.text(function(d) {
+					return choropleth(d, colorize);
+				});
+		
+		setChart(maternityData, colorize); //create coordinated visualization
 	};
+};
+
+function setChart(maternityData, colorize) {
+
+	var chart = d3.select("body")
+		.append("svg")
+		.attr("width", chartWidth)
+		.attr("height", chartHeight)
+		.attr("class", "chart");
+
+	var title = chart.append("text")
+		.attr("x", 20)
+		.attr("y", 40)
+		.attr("class", "chartTitle");
+
+	var bars = chart.selectAll(".bar")
+		.data(maternityData)
+		.enter()
+		.append("rect")
+		.sort(function(a, b) {return a[currentVariable]-b[currentVariable]})
+		.attr("class", function(d){
+			return "bar " + d.CountryCode;
+		})
+		.attr("width", chartWidth / maternityData.length - 1);
 };
 
 function colorScale(maternityData) {
@@ -125,32 +164,32 @@ function colorScale(maternityData) {
 	var color;
 	//if the data is ordinal, set color to an ordinal scale
 	//NOTE: These if-else statements aren't working: error in Firebug says TypeError: maternityData[i] is undefined - but I can't figure out why
-	if (maternityData[i][currentVariable] == "MaternalLeave" || maternityData[i][currentVariable] == "PaternalLeave") {
+	if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
 		color = d3.scale.ordinal()
 		.range([
 			"#DE872C",
-			"#FFE2DF",
-			"#E5B3C3",
-			"#AD6E97",
-			"#754773",
-			"#29182B"
+			"#edf8fb",
+			"#b3cde3",
+			"#8c96c6",
+			"#8856a7",
+			"#810f7c"	
 		]);
 	} else { //otherwise, the data is numeric, so set color to a quantile scale
 		color = d3.scale.quantile()
 		.range([
-			"#FFE2DF",
-			"#E5B3C3",
-			"#AD6E97",
-			"#754773",
-			"#29182B"
+			"#edf8fb",
+			"#b3cde3",
+			"#8c96c6",
+			"#8856a7",
+			"#810f7c"	
 		]);
 	};
 
 	var currentArray = [];	
 	for (var i in maternityData) {
 		//if the data is ordinal, just add the string to the current array
-		if (maternityData[i][currentVariable] == "MaternalLeave" || maternityData[i][currentVariable] == "PaternalLeave") {
-			currentArray.push(maternityData[i][currentVariable]); 
+		if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
+			currentArray.push(currentVariable); 
 		} else { //else, convert data to number and add to current array
 			currentArray.push(Number(maternityData[i][currentVariable]));
 		};
@@ -169,4 +208,64 @@ function choropleth(d, colorize){
 	} else {
 		return "#ccc";
 	};
+};
+
+function highlight(maternityData) {
+	var properties = maternityData.properties ? maternityData.properties : maternityData;
+
+	d3.selectAll("."+properties.code3)
+		.style("fill", "#ebfa7b");
+
+	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
+	var labelName = properties.name;
+
+	
+	if (Boolean(properties[currentVariable]) == true) {
+		if (currentVariable == "MaternalLeave") {
+			labelAttribute = properties[currentVariable];
+		} else if (currentVariable == "MaternalDeath") {
+			labelAttribute = "1 in "+properties[currentVariable]+"<br>women die from maternal causes"
+		} else if (currentVariable == "FemaleLaborForceTotal") {
+			labelAttribute = properties[currentVariable]+"%<br> of the labor force is composed of women"
+		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
+			labelAttribute = properties[currentVariable]+"%<br> of women work"
+		} else if (currentVariable == "FertilityRate") {
+			labelAttribute = properties[currentVariable]+"<br>Average Number of Children Per Woman"
+		};
+	} else { //if no data associated with selection, display "No data"
+		labelAttribute = "No data";
+	};
+
+	var infoLabel = d3.select("body")
+		.append("div")
+		.attr("class", "infoLabel")
+		.attr("id",properties.code3+"label")
+		.html(labelName)
+		.append("div")
+		.html(labelAttribute)
+		.attr("class", "labelName");
+};
+
+function dehighlight(maternityData) {
+	var properties = maternityData.properties ? maternityData.properties : maternityData;
+
+	var selection = d3.selectAll("."+properties.code3)
+		.style("fill", "#ebfa7b");
+
+	var fillColor = selection.select("desc").text();
+	selection.style("fill", fillColor);
+
+	var deselect = d3.select("#"+properties.code3+"label").remove(); //remove info label
+};
+
+function moveLabel(maternityData) {
+
+	//horizontal label coordinate based mouse position stored in d3.event
+	var x = d3.event.clientX < window.innerWidth - 245 ? d3.event.clientX+10 : d3.event.clientX-210; 
+	//vertical label coordinate
+	var y = d3.event.clientY < window.innerHeight - 100 ? d3.event.clientY-75 : d3.event.clientY-175; 
+	
+	d3.select(".infoLabel") //select the label div for moving
+		.style("margin-left", x+"px") //reposition label horizontal
+		.style("margin-top", y+"px"); //reposition label vertical
 };
