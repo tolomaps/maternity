@@ -6,7 +6,7 @@ svg {
 }
 
 .map {
-	margin-left: 200px;	
+	margin-left: 100px;	
 }
 
 .countries {
@@ -29,7 +29,7 @@ svg {
 	background-color: #fff;
 	border: medium solid #999;
 	margin-left: 200px;
-	margin-top: 450px;
+	margin-top: 520px;
 }
 
 .infoLabel {
@@ -40,4 +40,9 @@ svg {
 	background-color: #000;
 	border: solid thin #fff;
 	padding: 5px;
+}
+
+select {
+	position:absolute;
+	z-index:100;
 }

@@ -10,11 +10,13 @@ Robin Tolochko
 November 2014
 *************************************************************/
 var keyArray = ["MaternalLeave", "PaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
-var currentVariable = keyArray[5]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
+colorArray = []
+var currentVariable = keyArray[2]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
 var jsonCountries;
 var colorize;
-var mapWidth = 850, mapHeight = 450; //set map container dimensions
+var mapWidth = 1000, mapHeight = 500; //set map container dimensions
 var chartWidth = 840, chartHeight = 150; //set chart container dimensions
+var scale;
 
 //begin script when window loads 
 window.onload = initialize();
@@ -34,7 +36,7 @@ function setMap(){
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
-    	.scale(150)
+    	.scale(170)
     	.translate([mapWidth / 2, mapHeight / 2])
     	.precision(.1);
 
@@ -121,6 +123,7 @@ function setMap(){
 				return path(d);
 			})
 			.style("fill", function(d){
+				console.log(choropleth(d, colorize));	
 				return choropleth(d, colorize); // will need to change this so that it updates dynamically depending on the currentVariable - see Carl's email
 			})
 			.on("mouseover", highlight)
@@ -129,10 +132,51 @@ function setMap(){
 			.append("desc")
 				.text(function(d) {
 					return choropleth(d, colorize);
+					// var baseX, baseY = 0;
+					// var color = colorize(d);
+					// if (color == "#edf8fb"){
+					// 	baseX = 0;
+					// } else if (color == "#b3cde3"){
+					// 	baseX = 100;
+					// } else {
+					// 	baseX = 200;
+					// }
 				});
 		
+		createDropdown(maternityData);
 		setChart(maternityData, colorize); //create coordinated visualization
 	};
+};
+
+function createDropdown(maternityData) {
+	var dropdown = d3.select("body")
+		.append("div")
+		.attr("class", "dropdown")
+		.html("<h3>Select Variable:</h3>")
+		.append("select")
+		.on("change", function() { changeAttribute(this.value, maternityData) } );
+
+	dropdown.selectAll("options")
+		.data(keyArray)
+		.enter()
+		.append("option")
+		.attr("value", function(d) { return d })
+		.text(function(d) {
+			if (d == "MaternalLeave") {
+				d = "Maternity Leave Law";
+			} else if (d == "PaternalLeave") {
+				d = "Paternity Leave Law";
+			} else if (d == "MaternalDeath") {
+				d = "Lifetime Risk of Maternal Death";
+			} else if (d == "FemaleLaborForceTotal") {
+				d = "Women as Percentage of Labor Force";
+			} else if (d == "FemaleLaborForceParticipationRate") {
+				d = "Women Labor Force Participation Rate";
+			} else if (d == "FertilityRate") {
+				d = "Fertility Rate";
+			};
+			return d;
+		});
 };
 
 function setChart(maternityData, colorize) {
@@ -156,16 +200,17 @@ function setChart(maternityData, colorize) {
 		.attr("class", function(d){
 			return "bar " + d.CountryCode;
 		})
-		.attr("width", chartWidth / maternityData.length - 1);
+		.attr("width", chartWidth / maternityData.length - 1)
+		.attr("height", chartHeight / maternityData.length - 1);
 };
 
 function colorScale(maternityData) {
 	//creating a variable to hold color generator
-	var color;
+	// var color;
 	//if the data is ordinal, set color to an ordinal scale
 	//NOTE: These if-else statements aren't working: error in Firebug says TypeError: maternityData[i] is undefined - but I can't figure out why
 	if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
-		color = d3.scale.ordinal()
+		scale = d3.scale.ordinal()
 		.range([
 			"#DE872C",
 			"#edf8fb",
@@ -175,7 +220,7 @@ function colorScale(maternityData) {
 			"#810f7c"	
 		]);
 	} else { //otherwise, the data is numeric, so set color to a quantile scale
-		color = d3.scale.quantile()
+		scale = d3.scale.quantile()
 		.range([
 			"#edf8fb",
 			"#b3cde3",
@@ -183,6 +228,16 @@ function colorScale(maternityData) {
 			"#8856a7",
 			"#810f7c"	
 		]);
+	//threshold scale alternative
+	// } else {
+	// 	color = d3.scale.threshold()
+	// 	.range([
+	// 		"#edf8fb",
+	// 		"#b3cde3",
+	// 		"#8c96c6",
+	// 		"#8856a7",
+	// 		"#810f7c"	
+	// 	]);
 	};
 
 	var currentArray = [];	
@@ -194,8 +249,8 @@ function colorScale(maternityData) {
 			currentArray.push(Number(maternityData[i][currentVariable]));
 		};
 	};
-	color.domain(currentArray); //pass array of values as the domain
-	return color; //return color scale generator
+	scale.domain(currentArray); //pass array of values as the domain
+	return scale; //return color scale generator
 };
 
 
@@ -210,6 +265,24 @@ function choropleth(d, colorize){
 	};
 };
 
+function changeAttribute(attribute, maternityData) {
+
+	//update the current variable
+	currentVariable = attribute;
+	colorize = colorScale(maternityData);
+
+	//update the map colors
+	d3.selectAll(".countries") 
+		.select("path")
+		.style("fill", function(d) {
+			return choropleth(d, colorize);
+		})
+		.select("desc")
+			.text(function(d) {
+				return choropleth(d, colorize);
+			});
+};
+
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
 
@@ -217,7 +290,7 @@ function highlight(maternityData) {
 		.style("fill", "#ebfa7b");
 
 	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
-	var labelName = properties.name;
+	var labelName = properties.name_long;
 
 	
 	if (Boolean(properties[currentVariable]) == true) {
