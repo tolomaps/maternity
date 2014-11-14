@@ -9,25 +9,40 @@ policies, and women participation in the labor force.
 Robin Tolochko
 November 2014
 *************************************************************/
-var keyArray = ["MaternalLeave", "PaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
+var keyArray = ["MaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
 //array to hold colors for maternal & paternal leave
-ordinalColorArray = [ "#DE872C",
-				  "#edf8fb",
-				  "#b3cde3",
-				  "#8c96c6",
-				  "#8856a7",
-				  "#810f7c" ];
-//array to hold colors for all other variables
-colorArray = [	"#edf8fb",
-			"#b3cde3",
-			"#8c96c6",
-			"#8856a7",
-			"#810f7c"	];
-var currentVariable = keyArray[0]; //testing first with third variable in CSV since it's numeric, make sure that works first before worrying about ordinal data
+ordinalColorArray = [ "#fb6a4a",	//no paid leave
+				  "#ccc",		//no data
+				  "#bcbddc",	//less than 14 weeks
+				  "#54278f",	//52 weeks or more
+				  "#9e9ac8",	//14-25 weeks
+				  "#756bb1"	// 26-51 weeks
+				  	]; 
+
+//color array for maternal death
+deathColorArray = [	"#54278f",
+				"#756bb1",
+				"#9e9ac8",
+				"#bcbddc",
+				"#dadaeb"	];
+
+//array to hold colors for all other variables				
+colorArray = [	"#dadaeb",
+			"#bcbddc",
+			"#9e9ac8",
+			"#756bb1",
+			"#54278f"	];
+maternalLeaveArray = [   "No data",
+					"No paid leave",
+					"Less than 14 weeks",
+					"14 - 25 weeks",
+					"26 - 51 weeks",
+					"52 weeks or more" ];
+var currentVariable = keyArray[0]; 
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var chartWidth = 840, chartHeight = 150; //set chart container dimensions
+var chartWidth = 200, chartHeight = 500; //set chart container dimensions
 var scale;
 
 //begin script when window loads 
@@ -45,6 +60,12 @@ function setMap(){
 		.attr("width", mapWidth)
 		.attr("height", mapHeight)
 		.attr("class", "map");
+
+	//create page title
+	var pageTitle = d3.select("body")
+		.append("text")
+		.attr("class", "pageTitle")
+		.html("It Ain't Easy Having a Vagina");
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
@@ -156,7 +177,7 @@ function createDropdown(maternityData) {
 	var dropdown = d3.select("body")
 		.append("div")
 		.attr("class", "dropdown")
-		.html("<h3>Select Variable:</h3>")
+		.html("<h3>Pick Your Poison:</h3>")
 		.append("select")
 		.on("change", function() { changeAttribute(this.value, maternityData) } );
 
@@ -191,7 +212,6 @@ function changeAttribute(attribute, maternityData) {
 
 	//update the map colors
 	d3.selectAll(".countries") 
-		.select("path")
 		.style("fill", function(d) {
 			return choropleth(d, colorize);
 		})
@@ -208,6 +228,9 @@ function colorScale(maternityData) {
 	if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
 		scale = d3.scale.ordinal()
 		.range(ordinalColorArray);
+	} else if (currentVariable == "MaternalDeath") {
+		scale = d3.scale.quantile()
+		.range(deathColorArray);
 	} else { //otherwise, the data is numeric, so set color to a quantile scale
 		scale = d3.scale.quantile()
 		.range(colorArray);
@@ -279,13 +302,20 @@ function setChart(maternityData, colorize) {
 					// } else {
 					// 	baseX = 200;
 					// }
+	d3.select(".chartTitle")
+		.text("Chart Title");
+
+};
+
+function updateChart(squares, colorize) {
+
 };
 
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
 
 	d3.selectAll("."+properties.code3)
-		.style("fill", "#ebfa7b");
+		.style("fill", "#f7eb3e");
 
 	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
 	var labelName = properties.name_long;
@@ -297,9 +327,9 @@ function highlight(maternityData) {
 		} else if (currentVariable == "MaternalDeath") {
 			labelAttribute = "1 in "+properties[currentVariable]+"<br>women die from maternal causes"
 		} else if (currentVariable == "FemaleLaborForceTotal") {
-			labelAttribute = properties[currentVariable]+"%<br> of the labor force is composed of women"
+			labelAttribute = properties[currentVariable]+"% of the labor force is composed of women"
 		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
-			labelAttribute = properties[currentVariable]+"%<br> of women work"
+			labelAttribute = properties[currentVariable]+"% of women work"
 		} else if (currentVariable == "FertilityRate") {
 			labelAttribute = properties[currentVariable]+"<br>Average Number of Children Per Woman"
 		};
@@ -321,7 +351,7 @@ function dehighlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
 
 	var selection = d3.selectAll("."+properties.code3)
-		.style("fill", "#ebfa7b");
+		.style("fill", "#f7eb3e");
 
 	var fillColor = selection.select("desc").text();
 	selection.style("fill", fillColor);
