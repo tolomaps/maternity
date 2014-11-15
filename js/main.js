@@ -65,7 +65,7 @@ function setMap(){
 	var pageTitle = d3.select("body")
 		.append("text")
 		.attr("class", "pageTitle")
-		.html("It Ain't Easy Having a Vagina");
+		.html("Catchy Title Here");
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
@@ -283,16 +283,23 @@ function setChart(maternityData, colorize) {
 		.attr("y", 40)
 		.attr("class", "chartTitle");
 
-	var bars = chart.selectAll(".bar")
+	var axisX = chart.append("chart")
+		.call(d3.svg.axis()
+		.scale(xScalef)
+		.orient("bottom"))
+		.attr("class", "axisX");
+
+	var squares = chart.selectAll(".square")
 		.data(maternityData)
 		.enter()
 		.append("rect")
-		.sort(function(a, b) {return a[currentVariable]-b[currentVariable]})
 		.attr("class", function(d){
-			return "bar " + d.CountryCode;
+			return "square " + d.CountryCode;
 		})
 		.attr("width", chartWidth / maternityData.length - 1)
 		.attr("height", chartHeight / maternityData.length - 1);
+	
+
 					// var baseX, baseY = 0;
 					// var color = colorize(d);
 					// if (color == "#edf8fb"){
