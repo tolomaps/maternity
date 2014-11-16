@@ -171,9 +171,17 @@ function setMap(){
 				.text(function(d) {
 					return choropleth(d, colorize);
 				});
-		
+
+		//Attempt to create topojson mesh to minimize complexity at borders		
+		// var borders = svg.append("path")
+		// 	.datum(topojson.mesh(countries, countries.properties.code3, function(a, b) {
+		// 		return a !==b;
+		// 	}));
+
+
 		createDropdown(maternityData);
 		setChart(maternityData, colorize); //create coordinated visualization
+		// zoom();
 	};
 };
 
@@ -260,6 +268,7 @@ function colorScale(maternityData) {
 		};
 	};
 	scale.domain(currentArray); //pass array of values as the domain
+
 	return scale; //return color scale generator
 };
 
@@ -310,14 +319,59 @@ function setChart(maternityData, colorize) {
 
 function updateChart(squares, numSquares, maternityData){
 	colorize = colorScale(maternityData);
-	var baseX, baseY = 0;
+	var xValue, yValue = 0;
+	var colorObjectArray = [];
+	for (i = 0; i < currentColors.length; i++) {
+		var colorObject =  {"color": currentColors[i],"count":0} ;
+		colorObjectArray.push(colorObject);			
+	}
 
 	var squareColor = squares.style("fill", function(d) {
 			return choropleth(d, colorize);
 		})
-		.attr("class", "squareColor");
+		.attr("class", "squareColor")
+		.attr("x", function(d,i) {
+			color = choropleth(d, colorize);
+			for (i = 0; i < colorObjectArray.length; i++) {
+				if (colorObjectArray[i].color == color) {
+					xValue = colorObjectArray[i].count*11;
+					colorObjectArray[i].count+=1;
+				}
+			}
+		
+			// if (color == colorObjectArray.color) {
+			// }
+			return xValue;
+		})
+		.attr("y", function(d,i) {
+			color = choropleth(d, colorize);
+			console.log(this);
+			if (color == currentColors[0]) {
+				if (this.x > chartWidth) {
+					return 0 + 10;
+				} else {
+					return 0;	
+				}
+			} else if (color == currentColors[1]) {
+				if (this.x > chartWidth) {
+					return 100 + 10;
+				} else {
+					return 100;	
+				}
+			} else if (color == currentColors[2]) {
+				return 200;
+			} else if (color == currentColors[3]) {
+				return 300;
+			} else if (color == currentColors[4]) {
+				return 400;
+			} else if (color == currentColors[5]) {
+				return 500;
+			}
+			
+		})
+	};
 
-	var color = colorize(currentVariable);
+	
 
 	// for (var i=0; i<maternityData.length; i++) {
 	// 	if (color == currentColors[0]) {
@@ -334,23 +388,10 @@ function updateChart(squares, numSquares, maternityData){
 	// 		return 500;
 	// };
 
-	var squarePosition = squareColor.attr("y", function(d, i){
-		if (color == currentColors[0]) {
-			return 0;
-		} else if (color == currentColors[1]) {
-			return 100;
-		} else if (color == currentColors[2]) {
-			return 200;
-		} else if (color == currentColors[3]) {
-			return 300;
-		} else if (color == currentColors[4]) {
-			return 400;
-		} else if (color == currentColors[5]) {
-			return 500;
-			}
-		})
-		.attr("x", 40)
-		.attr("class", squarePosition);
+	// var squarePosition = squareColor.attr("y", function(d, i){
+		
+	// 	.attr("x", 40)
+	// 	.attr("class", squarePosition);
 
 	// if (color == "#edf8fb"){
 	// 	baseX = 0;
@@ -359,7 +400,7 @@ function updateChart(squares, numSquares, maternityData){
 	// } else {
 	// 	baseX = 200;
 	// }
-};
+// };
 
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
@@ -420,3 +461,32 @@ function moveLabel(maternityData) {
 		.style("margin-left", x+"px") //reposition label horizontal
 		.style("margin-top", y+"px"); //reposition label vertical
 };
+
+// function zoom() {
+// 	var zoom = d3.behavior.zoom()
+// 	    	.translate([0, 0])
+// 	    	.scale(1)
+// 	    	.scaleExtent([1, 8])
+// 	    	.on("zoom", zoomed);
+
+// 	var background = d3.select(".map")
+// 		.append("rect")
+// 	    	.attr("class", "background")
+// 	    	.attr("width", mapWidth)
+// 	    	.attr("height", mapHeight)
+// 	    	.on("click", reset);
+
+// 	function reset() {
+// 		active.classed("active", false);
+// 		active = d3.select(null);
+
+// 		svg.transition()
+// 		    .duration(750)
+// 		    .call(zoom.translate([0, 0]).scale(1).event);
+// 		}
+
+// 	function zoomed() {
+// 		g.style("stroke-width", 1.5 / d3.event.scale + "px");
+// 		g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+// 	};
+// };
