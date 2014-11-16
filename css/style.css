@@ -41,7 +41,7 @@ body {
 
 .chart {
 	background-color: #fff;
-	border: medium solid #999;
+	/*border: medium solid #999;*/
 	margin-left: 20px;
 	margin-top: 40px;
 	margin-bottom: 50px;
@@ -49,7 +49,11 @@ body {
 }
 
 .chartTitle {
+	color:black;
+}
 
+.axis {
+	stroke:black;
 }
 
 .labelName {

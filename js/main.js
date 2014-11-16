@@ -9,6 +9,9 @@ policies, and women participation in the labor force.
 Robin Tolochko
 November 2014
 *************************************************************/
+
+//Set up all global variables
+
 var keyArray = ["MaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
 //array to hold colors for maternal & paternal leave
 ordinalColorArray = [ "#fb6a4a",	//no paid leave
@@ -39,11 +42,15 @@ maternalLeaveArray = [   "No data",
 					"26 - 51 weeks",
 					"52 weeks or more" ];
 var currentVariable = keyArray[0]; 
+var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
 var chartWidth = 200, chartHeight = 500; //set chart container dimensions
 var scale;
+
+//Holds the current range of colors
+var range;
 
 //begin script when window loads 
 window.onload = initialize();
@@ -103,8 +110,6 @@ function setMap(){
 	// 	var countries = map.selectAll(".countries")
 	// 		.data(topojson.feature(countries, countries.objects.countries).features)
 	function callback(error, maternityData, countries) { //the callback function accepts an error, and then after the error, one parameter for each defer line within queue(). it accepts them in the same order that the defer lines are placed... so in this case, maternityData is written first, and then countries, so that's the order they're accepted as parameters
-		// var colorize = colorScale(maternityData);
-		// console.log(colorize);
 
 		var colorize = colorScale(maternityData);
 
@@ -157,7 +162,7 @@ function setMap(){
 			})
 			.style("fill", function(d){
 				// console.log(choropleth(d, colorize));	
-				return choropleth(d, colorize); // will need to change this so that it updates dynamically depending on the currentVariable - see Carl's email
+				return choropleth(d, colorize); // updates dynamically depending on the currentVariable
 			})
 			.on("mouseover", highlight)
 			.on("mouseout", dehighlight)
@@ -219,6 +224,11 @@ function changeAttribute(attribute, maternityData) {
 			.text(function(d) {
 				return choropleth(d, colorize);
 			});
+
+	var squares = d3.selectAll(".square")
+		.style("fill", function(d) {
+			return choropleth(d, colorize);
+		})
 };
 
 function colorScale(maternityData) {
@@ -226,25 +236,19 @@ function colorScale(maternityData) {
 	// var color;
 	//if the data is ordinal, set color to an ordinal scale
 	if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
-		scale = d3.scale.ordinal()
-		.range(ordinalColorArray);
+		scale = d3.scale.ordinal();
+		currentColors = ordinalColorArray;
+	//the Maternal Death variable should have reversed colors to represent higher rates of death as darker colors
 	} else if (currentVariable == "MaternalDeath") {
-		scale = d3.scale.quantile()
-		.range(deathColorArray);
-	} else { //otherwise, the data is numeric, so set color to a quantile scale
-		scale = d3.scale.quantile()
-		.range(colorArray);
-	//threshold scale alternative
-	// } else {
-	// 	color = d3.scale.threshold()
-	// 	.range([
-	// 		"#edf8fb",
-	// 		"#b3cde3",
-	// 		"#8c96c6",
-	// 		"#8856a7",
-	// 		"#810f7c"	
-	// 	]);
+		scale = d3.scale.quantile();
+		currentColors = deathColorArray;
+	} else { //otherwise, set color to a quantile scale
+		scale = d3.scale.quantile();
+		currentColors = colorArray;
 	};
+
+	//set the range to the appropriate range based on which variable is selected
+	scale = scale.range(currentColors);
 
 	var currentArray = [];	
 	for (var i in maternityData) {
@@ -261,6 +265,7 @@ function colorScale(maternityData) {
 
 function choropleth(d, colorize){
 	//get data value
+	
 	var value = d.properties ? d.properties[currentVariable] : d[currentVariable];
 	//if the value exists, assign it a color; otherwise assign gray
 	if (value) {
@@ -281,41 +286,79 @@ function setChart(maternityData, colorize) {
 	var title = chart.append("text")
 		.attr("x", 20)
 		.attr("y", 40)
-		.attr("class", "chartTitle");
+		.attr("class", "chartTitle")
+		.text("Chart Title");
 
-	var axisX = chart.append("chart")
-		.call(d3.svg.axis()
-		.scale(xScalef)
-		.orient("bottom"))
-		.attr("class", "axisX");
+	// var xAxis = chart.append("g")
+	// 	.call(d3.svg.axis()
+	// 		.scale(scale)
+	// 		.orient("bottom")
+	// 		.attr("class", "xAxis"));
 
 	var squares = chart.selectAll(".square")
 		.data(maternityData)
 		.enter()
 		.append("rect")
 		.attr("class", function(d){
-			return "square " + d.CountryCode;
+			return "square " + d.code3;
 		})
-		.attr("width", chartWidth / maternityData.length - 1)
-		.attr("height", chartHeight / maternityData.length - 1);
-	
+		.attr("width", 10 + "px")
+		.attr("height", 10 + "px");
 
-					// var baseX, baseY = 0;
-					// var color = colorize(d);
-					// if (color == "#edf8fb"){
-					// 	baseX = 0;
-					// } else if (color == "#b3cde3"){
-					// 	baseX = 100;
-					// } else {
-					// 	baseX = 200;
-					// }
-	d3.select(".chartTitle")
-		.text("Chart Title");
-
+	updateChart(squares, maternityData.length, maternityData);
 };
 
-function updateChart(squares, colorize) {
+function updateChart(squares, numSquares, maternityData){
+	colorize = colorScale(maternityData);
+	var baseX, baseY = 0;
 
+	var squareColor = squares.style("fill", function(d) {
+			return choropleth(d, colorize);
+		})
+		.attr("class", "squareColor");
+
+	var color = colorize(currentVariable);
+
+	// for (var i=0; i<maternityData.length; i++) {
+	// 	if (color == currentColors[0]) {
+	// 		return 0;
+	// 	} else if (color == currentColors[1]) {
+	// 		return 100;
+	// 	} else if (color == currentColors[2]) {
+	// 		return 200;
+	// 	} else if (color == currentColors[3]) {
+	// 		return 300;
+	// 	} else if (color == currentColors[4]) {
+	// 		return 400;
+	// 	} else if (color == currentColors[5]) {
+	// 		return 500;
+	// };
+
+	var squarePosition = squareColor.attr("y", function(d, i){
+		if (color == currentColors[0]) {
+			return 0;
+		} else if (color == currentColors[1]) {
+			return 100;
+		} else if (color == currentColors[2]) {
+			return 200;
+		} else if (color == currentColors[3]) {
+			return 300;
+		} else if (color == currentColors[4]) {
+			return 400;
+		} else if (color == currentColors[5]) {
+			return 500;
+			}
+		})
+		.attr("x", 40)
+		.attr("class", squarePosition);
+
+	// if (color == "#edf8fb"){
+	// 	baseX = 0;
+	// } else if (color == "#b3cde3"){
+	// 	baseX = 100;
+	// } else {
+	// 	baseX = 200;
+	// }
 };
 
 function highlight(maternityData) {
