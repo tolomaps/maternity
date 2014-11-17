@@ -47,11 +47,12 @@ var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var chartWidth = 1200, chartHeight = 100; //set chart container dimensions
+var chartWidth = 1150, chartHeight = 100; //set chart container dimensions
 var scale;
 
 //Holds the current range of colors
 var range;
+var ifChart; //checks to see if highlight is on the chart
 
 //begin script when window loads 
 window.onload = initialize();
@@ -73,7 +74,7 @@ function setMap(){
 	var pageTitle = d3.select("body")
 		.append("text")
 		.attr("class", "pageTitle")
-		.html("Working Moms Around the World");
+		.html("Modern Motherhood:<br>A World of Struggle");
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
@@ -182,6 +183,7 @@ function setMap(){
 
 		createDropdown(maternityData);
 		setChart(maternityData, colorize); //create coordinated visualization
+		createDescriptions();
 		// zoom();
 	};
 };
@@ -191,7 +193,7 @@ function createDropdown(maternityData) {
 	var dropdown = d3.select("body")
 		.append("div")
 		.attr("class", "dropdown")
-		.html("<h3>Pick Your Poison:</h3>")
+		.html("<h3>Select a Statistic:</h3>")
 		.append("select")
 		.on("change", function() { changeAttribute(this.value, maternityData) } );
 
@@ -248,10 +250,10 @@ function colorScale(maternityData) {
 		currentColors = ordinalColorArray;
 	//the Maternal Death variable should have reversed colors to represent higher rates of death as darker colors
 	} else if (currentVariable == "MaternalDeath") {
-		scale = d3.scale.quantile();
+		scale = d3.scale.threshold();
 		currentColors = deathColorArray;
-	} else { //otherwise, set color to a quantile scale
-		scale = d3.scale.quantile();
+	} else { //otherwise, set color to a threshold scale with regular colors
+		scale = d3.scale.threshold();
 		currentColors = colorArray;
 	};
 
@@ -263,12 +265,17 @@ function colorScale(maternityData) {
 		//if the data is ordinal, just add the string to the current array
 		if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
 			currentArray = maternalLeaveArray; 
-		} else { //else, convert data to number and add to current array
-			currentArray.push(Number(maternityData[i][currentVariable]));
+		} else if (currentVariable == "MaternalDeath") { //else, convert data to number and add to current array
+			currentArray = [100, 500, 1000, 5000, 50000];
+		} else if (currentVariable == "FemaleLaborForceTotal") {
+			currentArray = [30, 40, 45, 50, 60];
+		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
+			currentArray = [30, 50, 57, 65, 100];
+		} else if (currentVariable == "FertilityRate") {
+			currentArray = [1.50001, 2, 3, 5, 8];
 		};
 	};
 	scale.domain(currentArray); //pass array of values as the domain
-
 	return scale; //return color scale generator
 };
 
@@ -324,14 +331,14 @@ function updateChart(squares, numSquares, maternityData){
 	var yValue = 0;
 	var colorObjectArray = [];
 
-
-	//create object array to hold a count of how many countries are o
+	//create object array to hold a count of how many countries are in each class
 	for (i = 0; i < currentColors.length; i++) {
 		var colorObject = {"color": currentColors[i],"count":0} ;
 		colorObjectArray.push(colorObject);			
 	}
 
 	var squareColor = squares.style("fill", function(d) {
+			ifChart = true;
 			return choropleth(d, colorize);
 		})
 		.attr("x", function(d,i) {
@@ -342,12 +349,14 @@ function updateChart(squares, numSquares, maternityData){
 					xValue = colorObjectArray[i].count*14;
 					colorObjectArray[i].count+=1;
 				}
+				if (color == "#ccc") {
+					xValue = -100000;
+				}
 			}
 			return xValue;
 		})
 		.attr("y", function(d,i) {
 			color = choropleth(d, colorize);
-			console.log(this);
 			// var xLocation = Parse(this);
 			if (color == currentColors[0]) {
 				return 0
@@ -362,21 +371,29 @@ function updateChart(squares, numSquares, maternityData){
 			} else if (color == currentColors[5]) {
 				return 14*5;
 			}
-		});
-		// .on("mouseover", highlight)
-		// .on("mouseout", dehighlight)
-		// .on("mousemove", moveLabel);
+		})
+		.on("mouseover", highlight)
+		.on("mouseout", dehighlight)
+		.on("mousemove", moveLabel);
 	};
 
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
-
+	console.log(properties)
+	
 	d3.selectAll("."+properties.code3)
 		.style("fill", "#f7eb3e");
 
 	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
-	var labelName = properties.name_long;
+	
+	var labelName;
+	if (properties.name_long == undefined) {
+		labelName = properties.Country;
+	} else {
+		labelName = properties.name_long;
+	}
 
+	console.log(labelName);
 	
 	if (Boolean(properties[currentVariable]) == true) {
 		if (currentVariable == "MaternalLeave") {
@@ -394,6 +411,7 @@ function highlight(maternityData) {
 		labelAttribute = "No data";
 	};
 
+
 	var infoLabel = d3.select("body")
 		.append("div")
 		.attr("class", "infoLabel")
@@ -407,7 +425,14 @@ function highlight(maternityData) {
 function dehighlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
 
-	var selection = d3.selectAll("."+properties.code3);
+	// var selection = d3.selectAll("."+properties.code3);
+
+	var selection;
+	if (properties.code3 == undefined) {
+		selection = d3.selectAll("."+properties.CountryCode);
+	} else {
+		selection = d3.selectAll("."+properties.code3);
+	} 
 
 	var fillColor = selection.select("desc").text();
 	selection.style("fill", fillColor);
@@ -426,6 +451,15 @@ function moveLabel(maternityData) {
 		.style("margin-left", x+"px") //reposition label horizontal
 		.style("margin-top", y+"px"); //reposition label vertical
 };
+
+function createDescriptions() {
+	var description = d3.select("body")
+	.append("text")
+	.attr("x", 500)
+	.attr("y", 40)
+	.text("About this project:")
+	.attr("class", "description");
+}
 
 // function zoom() {
 // 	var zoom = d3.behavior.zoom()
