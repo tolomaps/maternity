@@ -14,13 +14,12 @@ November 2014
 
 var keyArray = ["MaternalLeave", "MaternalDeath", "FemaleLaborForceTotal", "FemaleLaborForceParticipationRate", "FertilityRate"];
 //array to hold colors for maternal & paternal leave
-ordinalColorArray = [ "#fb6a4a",	//no paid leave
-				  "#ccc",		//no data
+ordinalColorArray = [ "#fb6a4a",	//no paid leave 		
 				  "#bcbddc",	//less than 14 weeks
-				  "#54278f",	//52 weeks or more
 				  "#9e9ac8",	//14-25 weeks
-				  "#756bb1"	// 26-51 weeks
-				  	]; 
+				  "#756bb1",	// 26-51 weeks
+				  "#54278f",	//52 weeks or more
+				  "#ccc"	]; 	//no data
 
 //color array for maternal death
 deathColorArray = [	"#54278f",
@@ -35,18 +34,20 @@ colorArray = [	"#dadaeb",
 			"#9e9ac8",
 			"#756bb1",
 			"#54278f"	];
-maternalLeaveArray = [   "No data",
-					"No paid leave",
+
+//array to hold values for maternal leave			
+maternalLeaveArray = [  "No paid leave",
 					"Less than 14 weeks",
 					"14 - 25 weeks",
 					"26 - 51 weeks",
-					"52 weeks or more" ];
+					"52 weeks or more",
+					"No data" ];
 var currentVariable = keyArray[0]; 
 var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var chartWidth = 200, chartHeight = 500; //set chart container dimensions
+var chartWidth = 200, chartHeight = 600; //set chart container dimensions
 var scale;
 
 //Holds the current range of colors
@@ -155,7 +156,7 @@ function setMap(){
 			.enter()
 			.append("path")
 			.attr("class", function(d) {
-				return "countries " + d.properties.code3; 
+				return "countries " + d.properties.code3;
 			})
 			.attr("d", function(d) {
 				return path(d);
@@ -233,10 +234,9 @@ function changeAttribute(attribute, maternityData) {
 				return choropleth(d, colorize);
 			});
 
-	var squares = d3.selectAll(".square")
-		.style("fill", function(d) {
-			return choropleth(d, colorize);
-		})
+	var squares = d3.selectAll(".square");
+
+	updateChart(squares, maternityData.length, maternityData);
 };
 
 function colorScale(maternityData) {
@@ -262,7 +262,7 @@ function colorScale(maternityData) {
 	for (var i in maternityData) {
 		//if the data is ordinal, just add the string to the current array
 		if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
-			currentArray.push(currentVariable); 
+			currentArray = maternalLeaveArray; 
 		} else { //else, convert data to number and add to current array
 			currentArray.push(Number(maternityData[i][currentVariable]));
 		};
@@ -286,69 +286,75 @@ function choropleth(d, colorize){
 
 function setChart(maternityData, colorize) {
 
-	var chart = d3.select("body")
-		.append("svg")
+	//create container for chart
+	var chartDiv = d3.select("body")
+		.append("div")
+		.attr("class", "chartDiv");
+
+	//create chart SVG
+	var chart = chartDiv.append("svg")
 		.attr("width", chartWidth)
 		.attr("height", chartHeight)
 		.attr("class", "chart");
 
-	var title = chart.append("text")
+	//create chart title
+	var title = chartDiv.append("text")
 		.attr("x", 20)
 		.attr("y", 40)
 		.attr("class", "chartTitle")
-		.text("Chart Title");
+		.text("");
 
-	// var xAxis = chart.append("g")
-	// 	.call(d3.svg.axis()
-	// 		.scale(scale)
-	// 		.orient("bottom")
-	// 		.attr("class", "xAxis"));
-
+	//append squares to the chart, one square to represent each country
 	var squares = chart.selectAll(".square")
 		.data(maternityData)
 		.enter()
 		.append("rect")
 		.attr("class", function(d){
-			return "square " + d.code3;
+			return "square " + d.CountryCode;
 		})
-		.attr("width", 10 + "px")
-		.attr("height", 10 + "px");
+		.attr("width", 15 + "px")
+		.attr("height", 15 + "px");
+		// .on("mouseover", highlight)
+		// .on("mouseout", dehighlight)
+		// .on("mousemove", moveLabe);
 
 	updateChart(squares, maternityData.length, maternityData);
 };
 
 function updateChart(squares, numSquares, maternityData){
 	colorize = colorScale(maternityData);
-	var xValue, yValue = 0;
+	var xValue = 0; 
+	var yValue = 0;
 	var colorObjectArray = [];
+
+	//create object array to hold a count of how many countries are o
 	for (i = 0; i < currentColors.length; i++) {
-		var colorObject =  {"color": currentColors[i],"count":0} ;
+		var colorObject = {"color": currentColors[i],"count":0} ;
 		colorObjectArray.push(colorObject);			
 	}
+	
+	
 
 	var squareColor = squares.style("fill", function(d) {
 			return choropleth(d, colorize);
 		})
-		.attr("class", "squareColor")
 		.attr("x", function(d,i) {
 			color = choropleth(d, colorize);
+			//for loop arranges each class so that the squares are contiguous horizontally
 			for (i = 0; i < colorObjectArray.length; i++) {
 				if (colorObjectArray[i].color == color) {
-					xValue = colorObjectArray[i].count*11;
+					xValue = colorObjectArray[i].count*16.5;
 					colorObjectArray[i].count+=1;
 				}
 			}
-		
-			// if (color == colorObjectArray.color) {
-			// }
 			return xValue;
 		})
 		.attr("y", function(d,i) {
 			color = choropleth(d, colorize);
-			console.log(this);
+			// var xLocation = Parse(this);
 			if (color == currentColors[0]) {
 				if (this.x > chartWidth) {
-					return 0 + 10;
+					return 0 + 16.5;
 				} else {
 					return 0;	
 				}
@@ -367,7 +373,6 @@ function updateChart(squares, numSquares, maternityData){
 			} else if (color == currentColors[5]) {
 				return 500;
 			}
-			
 		})
 	};
 
@@ -393,13 +398,6 @@ function updateChart(squares, numSquares, maternityData){
 	// 	.attr("x", 40)
 	// 	.attr("class", squarePosition);
 
-	// if (color == "#edf8fb"){
-	// 	baseX = 0;
-	// } else if (color == "#b3cde3"){
-	// 	baseX = 100;
-	// } else {
-	// 	baseX = 200;
-	// }
 // };
 
 function highlight(maternityData) {
