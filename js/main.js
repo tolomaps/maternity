@@ -47,7 +47,7 @@ var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var chartWidth = 200, chartHeight = 600; //set chart container dimensions
+var chartWidth = 1200, chartHeight = 100; //set chart container dimensions
 var scale;
 
 //Holds the current range of colors
@@ -73,7 +73,7 @@ function setMap(){
 	var pageTitle = d3.select("body")
 		.append("text")
 		.attr("class", "pageTitle")
-		.html("Catchy Title Here");
+		.html("Working Moms Around the World");
 
 	//Set the projection 
 	var projection = d3.geo.naturalEarth()
@@ -312,11 +312,8 @@ function setChart(maternityData, colorize) {
 		.attr("class", function(d){
 			return "square " + d.CountryCode;
 		})
-		.attr("width", 15 + "px")
-		.attr("height", 15 + "px");
-		// .on("mouseover", highlight)
-		// .on("mouseout", dehighlight)
-		// .on("mousemove", moveLabe);
+		.attr("width", 13 + "px")
+		.attr("height", 13 + "px");
 
 	updateChart(squares, maternityData.length, maternityData);
 };
@@ -327,13 +324,12 @@ function updateChart(squares, numSquares, maternityData){
 	var yValue = 0;
 	var colorObjectArray = [];
 
+
 	//create object array to hold a count of how many countries are o
 	for (i = 0; i < currentColors.length; i++) {
 		var colorObject = {"color": currentColors[i],"count":0} ;
 		colorObjectArray.push(colorObject);			
 	}
-	
-	
 
 	var squareColor = squares.style("fill", function(d) {
 			return choropleth(d, colorize);
@@ -343,7 +339,7 @@ function updateChart(squares, numSquares, maternityData){
 			//for loop arranges each class so that the squares are contiguous horizontally
 			for (i = 0; i < colorObjectArray.length; i++) {
 				if (colorObjectArray[i].color == color) {
-					xValue = colorObjectArray[i].count*16.5;
+					xValue = colorObjectArray[i].count*14;
 					colorObjectArray[i].count+=1;
 				}
 			}
@@ -351,54 +347,26 @@ function updateChart(squares, numSquares, maternityData){
 		})
 		.attr("y", function(d,i) {
 			color = choropleth(d, colorize);
+			console.log(this);
 			// var xLocation = Parse(this);
 			if (color == currentColors[0]) {
-				if (this.x > chartWidth) {
-					return 0 + 16.5;
-				} else {
-					return 0;	
-				}
+				return 0
 			} else if (color == currentColors[1]) {
-				if (this.x > chartWidth) {
-					return 100 + 10;
-				} else {
-					return 100;	
-				}
+				return 14;
 			} else if (color == currentColors[2]) {
-				return 200;
+				return 14*2;
 			} else if (color == currentColors[3]) {
-				return 300;
+				return 14*3;
 			} else if (color == currentColors[4]) {
-				return 400;
+				return 14*4;
 			} else if (color == currentColors[5]) {
-				return 500;
+				return 14*5;
 			}
-		})
+		});
+		// .on("mouseover", highlight)
+		// .on("mouseout", dehighlight)
+		// .on("mousemove", moveLabel);
 	};
-
-	
-
-	// for (var i=0; i<maternityData.length; i++) {
-	// 	if (color == currentColors[0]) {
-	// 		return 0;
-	// 	} else if (color == currentColors[1]) {
-	// 		return 100;
-	// 	} else if (color == currentColors[2]) {
-	// 		return 200;
-	// 	} else if (color == currentColors[3]) {
-	// 		return 300;
-	// 	} else if (color == currentColors[4]) {
-	// 		return 400;
-	// 	} else if (color == currentColors[5]) {
-	// 		return 500;
-	// };
-
-	// var squarePosition = squareColor.attr("y", function(d, i){
-		
-	// 	.attr("x", 40)
-	// 	.attr("class", squarePosition);
-
-// };
 
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
@@ -439,8 +407,7 @@ function highlight(maternityData) {
 function dehighlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
 
-	var selection = d3.selectAll("."+properties.code3)
-		.style("fill", "#f7eb3e");
+	var selection = d3.selectAll("."+properties.code3);
 
 	var fillColor = selection.select("desc").text();
 	selection.style("fill", fillColor);

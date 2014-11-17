@@ -18,7 +18,7 @@ body {
 }
 
 .map {
-	margin-left: 240px;	
+	margin-left: 160px;	
 	margin-top: 100px;
 	position:absolute;
 }
@@ -43,7 +43,7 @@ body {
 	background-color: #fff;
 	/*border: medium solid #999;*/
 	margin-left: 20px;
-	margin-top: 20px;
+	margin-top: 550px;
 	margin-bottom: 50px;
 	position:absolute;
 	padding: 10px;
