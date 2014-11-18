@@ -74,7 +74,11 @@ body {
 
 .chartTitle {
 	color:black;
-	font-family: 'Montserrat', sans-serif;
+	margin-top:470px;
+	color:#f7eb3e;
+	font-family: 'Roboto Slab', serif;
+	font-size:20px;
+	position:absolute;
 }
 
 .chartLabel {

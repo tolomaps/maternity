@@ -47,6 +47,7 @@ var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
+var chartTitle;
 var squareWidth = 10;
 var squareHeight = 25;
 var chartWidth = 900;
@@ -312,8 +313,6 @@ function choropleth(d, colorize){
 
 function setChart(maternityData, colorize) {
 
-
-
 	//create container for chart
 	var chart = d3.select("body")
 		.append("svg")
@@ -322,14 +321,8 @@ function setChart(maternityData, colorize) {
 		.attr("class", "chart");
 
 	//create chart title
-	var chartTitle = chart.append("text")
-		.html(function(d) {
-			if (currentVariable == "MaternalLeave") { return title_MaternalLeave+"<br>" }
-			if (currentVariable == "MaternalDeath") { return title_MaternalDeath+"<br>"; }
-			if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal+"<br>"; }
-			if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+"<br>"; }
-			if (currentVariable == "FertilityRate") { return title_FertilityRate+"<br>"; } 
-		})
+	chartTitle = d3.select("body")
+		.append("text")
 		.attr("class", "chartTitle");
 
 	//append squares to the chart, one square to represent each country
@@ -343,6 +336,7 @@ function setChart(maternityData, colorize) {
 		.attr("width", squareWidth+"px")
 		.attr("height", squareHeight+"px");
 
+
 	updateChart(squares, maternityData.length, maternityData);
 };
 
@@ -351,6 +345,15 @@ function updateChart(squares, numSquares, maternityData){
 	var xValue = 0; 
 	var yValue = 0;
 	var colorObjectArray = [];
+
+	//update chart title based on selected attribute
+	chartTitle.text(function(d) {
+		if (currentVariable == "MaternalLeave") { return title_MaternalLeave; }
+		if (currentVariable == "MaternalDeath") { return title_MaternalDeath; }
+		if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal; }
+		if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate; }
+		if (currentVariable == "FertilityRate") { return title_FertilityRate; } 
+	});
 
 	//create object array to hold a count of how many countries are in each class
 	for (i = 0; i < currentColors.length; i++) {
