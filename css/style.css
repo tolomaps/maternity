@@ -42,8 +42,8 @@ body {
 
 /* MAP + MAP ELEMENTS */ 
 .map {
-	/*margin-left: 20%;*/	
-	margin-left: 300px;
+	margin-left: 20%;	
+	/*margin-left: 300px;*/
 	position:absolute;
 }
 
@@ -67,9 +67,8 @@ body {
 .chart {
 	background-color: #fff;
 	border: thick solid #fff;
-	margin-left: 24%;
-	margin-top: 370px;
-	margin-bottom: 50px;
+	/*margin-left: 200px;*/
+	margin-top: 500px;
 	position: absolute;
 }
 
@@ -108,6 +107,7 @@ h3 {
 .dropdown {
 	margin-top: 50px;
 	font-family: 'Montserrat', sans-serif;
+	position:absolute;
 }
 
 select {

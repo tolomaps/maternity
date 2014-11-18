@@ -255,7 +255,7 @@ function changeAttribute(attribute, maternityData) {
 
 	var squares = d3.selectAll(".square");
 	updateChart(squares, maternityData.length, maternityData);
-	createDescriptions(maternityData);
+	// createDescriptions(maternityData);
 };
 
 function colorScale(maternityData) {
@@ -312,6 +312,8 @@ function choropleth(d, colorize){
 
 function setChart(maternityData, colorize) {
 
+
+
 	//create container for chart
 	var chart = d3.select("body")
 		.append("svg")
@@ -320,11 +322,15 @@ function setChart(maternityData, colorize) {
 		.attr("class", "chart");
 
 	//create chart title
-	var title = chart.append("text")
-		.attr("x", 20)
-		.attr("y", 40)
-		.attr("class", "chartTitle")
-		.text("");
+	var chartTitle = chart.append("text")
+		.html(function(d) {
+			if (currentVariable == "MaternalLeave") { return title_MaternalLeave+"<br>" }
+			if (currentVariable == "MaternalDeath") { return title_MaternalDeath+"<br>"; }
+			if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal+"<br>"; }
+			if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+"<br>"; }
+			if (currentVariable == "FertilityRate") { return title_FertilityRate+"<br>"; } 
+		})
+		.attr("class", "chartTitle");
 
 	//append squares to the chart, one square to represent each country
 	var squares = chart.selectAll(".square")
@@ -393,7 +399,6 @@ function updateChart(squares, numSquares, maternityData){
 
 function highlightChart(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
-	console.log(properties.code3);
 	
 	d3.selectAll("."+properties.code3)
 		.style("fill", "#f7eb3e");
@@ -406,8 +411,6 @@ function highlightChart(maternityData) {
 	} else {
 		labelName = properties.name_long;
 	}
-
-	console.log(labelName);
 	
 	if (Boolean(properties[currentVariable]) == true) {
 		if (currentVariable == "MaternalLeave") {
@@ -424,7 +427,6 @@ function highlightChart(maternityData) {
 	} else { //if no data associated with selection, display "No data"
 		labelAttribute = "No data";
 	};
-	console.log(labelAttribute);
 
 	var infoLabel = d3.select("body")
 		.append("div")
@@ -480,16 +482,11 @@ function highlight(maternityData) {
 };
 
 function dehighlight(maternityData) {
-	console.log("dehighlight");
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
-	console.log(properties);
-	// var selection = d3.selectAll("."+properties.code3);
 
 	var selection = d3.selectAll("."+properties.code3);
-	console.log(selection);
 
 	var fillColor = selection.select("desc").text();
-	console.log(fillColor);
 	selection.style("fill", fillColor);
 	
 	var deselect = d3.select("#"+properties.code3+"label").remove(); //remove info label
