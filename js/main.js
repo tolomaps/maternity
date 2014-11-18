@@ -120,7 +120,7 @@ function setMap(){
 		//Create outer loop through csv data. Assign each country code to a variable.
 		for (var i=0; i<maternityData.length; i++) {
 			var csvCountry = maternityData[i]; 
-			var csvCountryCode = csvCountry.CountryCode;
+			var csvCountryCode = csvCountry.code3;
 
 			//create inner loop through json data to assign csv data to correct country
 			for (var j = 0; j < jsonCountries.length; j++) {
@@ -317,7 +317,7 @@ function setChart(maternityData, colorize) {
 		.enter()
 		.append("rect")
 		.attr("class", function(d){
-			return "square " + d.CountryCode;
+			return "square " + d.code3;
 		})
 		.attr("width", 13 + "px")
 		.attr("height", 13 + "px");
@@ -349,7 +349,7 @@ function updateChart(squares, numSquares, maternityData){
 					xValue = colorObjectArray[i].count*14;
 					colorObjectArray[i].count+=1;
 				}
-				if (color == "#ccc") {
+				if (color == "#ccc" || color == undefined) {
 					xValue = -100000;
 				}
 			}
@@ -372,20 +372,20 @@ function updateChart(squares, numSquares, maternityData){
 				return 14*5;
 			}
 		})
-		.on("mouseover", highlight)
+		.on("mouseover", highlightChart)
 		.on("mouseout", dehighlight)
 		.on("mousemove", moveLabel);
 	};
 
-function highlight(maternityData) {
+function highlightChart(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
-	console.log(properties)
+	console.log(properties.code3);
 	
 	d3.selectAll("."+properties.code3)
 		.style("fill", "#f7eb3e");
 
 	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
-	
+
 	var labelName;
 	if (properties.name_long == undefined) {
 		labelName = properties.Country;
@@ -401,11 +401,54 @@ function highlight(maternityData) {
 		} else if (currentVariable == "MaternalDeath") {
 			labelAttribute = "1 in "+properties[currentVariable]+"<br>women die from maternal causes"
 		} else if (currentVariable == "FemaleLaborForceTotal") {
-			labelAttribute = properties[currentVariable]+"% of the labor force is composed of women"
+			labelAttribute = Math.round(properties[currentVariable])+"% of the labor force is composed of women"
 		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
-			labelAttribute = properties[currentVariable]+"% of women work"
+			labelAttribute = Math.round(properties[currentVariable])+"% of women work"
 		} else if (currentVariable == "FertilityRate") {
-			labelAttribute = properties[currentVariable]+"<br>Average Number of Children Per Woman"
+			labelAttribute = Math.round(properties[currentVariable]*10)/10+"<br>Average Number of Children Per Woman"
+		};
+	} else { //if no data associated with selection, display "No data"
+		labelAttribute = "No data";
+	};
+	console.log(labelAttribute);
+
+	var infoLabel = d3.select("body")
+		.append("div")
+		.attr("class", "infoLabel")
+		.attr("id",properties.code3+"label")
+		.html(labelName)
+		.append("div")
+		.html(labelAttribute)
+		.attr("class", "labelName");	
+}
+
+
+function highlight(maternityData) {
+	var properties = maternityData.properties ? maternityData.properties : maternityData;
+	
+	d3.selectAll("."+properties.code3)
+		.style("fill", "#f7eb3e");
+
+	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
+	
+	var labelName;
+	if (properties.name_long == undefined) {
+		labelName = properties.Country;
+	} else {
+		labelName = properties.name_long;
+	}
+	
+	if (Boolean(properties[currentVariable]) == true) {
+		if (currentVariable == "MaternalLeave") {
+			labelAttribute = properties[currentVariable];
+		} else if (currentVariable == "MaternalDeath") {
+			labelAttribute = "1 in "+properties[currentVariable]+"<br>women die from maternal causes"
+		} else if (currentVariable == "FemaleLaborForceTotal") {
+			labelAttribute = Math.round(properties[currentVariable])+"% of the labor force is composed of women"
+		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
+			labelAttribute = Math.round(properties[currentVariable])+"% of women work"
+		} else if (currentVariable == "FertilityRate") {
+			labelAttribute = Math.round(properties[currentVariable]*10)/10+"<br>Average Number of Children Per Woman"
 		};
 	} else { //if no data associated with selection, display "No data"
 		labelAttribute = "No data";
@@ -423,21 +466,20 @@ function highlight(maternityData) {
 };
 
 function dehighlight(maternityData) {
+	console.log("dehighlight");
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
-
+	console.log(properties);
 	// var selection = d3.selectAll("."+properties.code3);
 
-	var selection;
-	if (properties.code3 == undefined) {
-		selection = d3.selectAll("."+properties.CountryCode);
-	} else {
-		selection = d3.selectAll("."+properties.code3);
-	} 
+	var selection = d3.selectAll("."+properties.code3);
+	console.log(selection);
 
 	var fillColor = selection.select("desc").text();
 	selection.style("fill", fillColor);
-
+	console.log(fillColor);
+	
 	var deselect = d3.select("#"+properties.code3+"label").remove(); //remove info label
+	console.log(deselect);
 };
 
 function moveLabel(maternityData) {
