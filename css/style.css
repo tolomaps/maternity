@@ -5,6 +5,7 @@ svg {
 	/*position: absolute;*/
 }
 
+/* MAIN PAGE ELEMENTS*/ 
 body {
 	background-image: url(gray_sand.png);
 	font-family: 'Roboto Slab', serif;
@@ -17,9 +18,10 @@ body {
 	font-family: 'Montserrat', sans-serif;
 }
 
+/* MAP + MAP ELEMENTS */ 
 .map {
-	margin-left: 160px;	
-	margin-top: 80px;
+	margin-left: 20%;	
+	/*margin-top: 80px;*/
 	position:absolute;
 }
 
@@ -39,15 +41,14 @@ body {
 	stroke-width: 0.5px;
 }
 
+/* CHART + CHART ELEMENTS*/
 .chart {
 	background-color: #fff;
-	/*border: medium solid #999;*/
-	margin-left: 20px;
-	margin-top: 520px;
+	border: thick solid #fff;
+	margin-left: 24%;
+	margin-top: 370px;
 	margin-bottom: 50px;
-	position:absolute;
-	padding: 10px;
-	padding-left: 50px;
+	position: relative;
 }
 
 .chartTitle {
@@ -55,9 +56,11 @@ body {
 	font-family: 'Montserrat', sans-serif;
 }
 
-.axis {
-	stroke:black;
+.chartLabel {
+
 }
+
+/* INFORMATION LABEL */ 
 
 .labelName {
 	font-weight: bold;
@@ -79,9 +82,10 @@ h3 {
 	font-weight: normal;
 }
 
+/* DROPDOWN MENU */
 .dropdown {
-	margin-left: 550px;
-	margin-top: -70px;
+/*	margin-left: 550px;
+	margin-top: -70px;*/
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -99,6 +103,7 @@ option {
 	width: auto;
 }
 
+/* PAGE DESCRIPTION AT BOTTOM OF PAGE */ 
 .description {
 	color: #f7eb3e;
 	margin-top: 700px;
