@@ -43,16 +43,18 @@ maternalLeaveArray = [  "No paid leave",
 					"52 weeks or more",
 					"No data" ];
 var currentVariable = keyArray[0]; 
-var currentColors = [];
+var currentColors = []; //array to hold the colors currently displayed on map
+var currentArray = []; //array to hold scale currently being rendered on map
 var jsonCountries;
-var colorize;
+var colorize; //colorscale generator
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var chartTitle;
-var squareWidth = 10;
-var squareHeight = 25;
-var chartWidth = 900;
+var chartTitle; //dynamic title for chart
+var chartLabels = []; //dynamic labels for chart
+var squareWidth = 10; //width of rects in chart (in pixels)
+var squareHeight = 25; //height of rects in chart (in pixels)
+var chartWidth = 900; //width of chart (in pixels)
 var chartHeight = (squareHeight*5)+5; //set chart container dimensions
-var scale;
+var scale; 
 var description; //description of selected variable
 
 // Create global title for each variable
@@ -62,13 +64,11 @@ var title_FemaleLaborForceTotal = "Women as Percentage of Labor Force";
 var title_FemaleLaborForceParticipationRate = "Women Labor Force Participation Rate";
 var title_FertilityRate = "Fertility Rate"			
 
-
 // Create global descriptions for each variable
 var desc_MaternalLeave = "Workplace policies before and after childbirth - Length of Paid Maternal Leave";
-
+var desc_MaternalDeath = "Life time risk of maternal death is the probability that a 15-year-old female will die eventually from a maternal cause assuming that current levels of fertility and mortality (including maternal mortality) do not change in the future, taking into account competing causes of death."
 //Holds the current range of colors
 var range;
-var ifChart; //checks to see if highlight is on the chart
 
 //begin script when window loads 
 window.onload = initialize();
@@ -277,8 +277,7 @@ function colorScale(maternityData) {
 
 	//set the range to the appropriate range based on which variable is selected
 	scale = scale.range(currentColors);
-
-	var currentArray = [];	
+	
 	for (var i in maternityData) {
 		//if the data is ordinal, just add the string to the current array
 		if (currentVariable == "MaternalLeave" || currentVariable == "PaternalLeave") {
@@ -325,6 +324,12 @@ function setChart(maternityData, colorize) {
 		.append("text")
 		.attr("class", "chartTitle");
 
+	chartLabels = d3.select("body")
+		.append("div")
+		.attr("width", 100)
+		.attr("height", chartHeight)
+		.attr("class", "chartLabels");
+
 	//append squares to the chart, one square to represent each country
 	var squares = chart.selectAll(".square")
 		.data(maternityData)
@@ -336,7 +341,6 @@ function setChart(maternityData, colorize) {
 		.attr("width", squareWidth+"px")
 		.attr("height", squareHeight+"px");
 
-
 	updateChart(squares, maternityData.length, maternityData);
 };
 
@@ -345,6 +349,17 @@ function updateChart(squares, numSquares, maternityData){
 	var xValue = 0; 
 	var yValue = 0;
 	var colorObjectArray = [];
+
+	console.log(currentArray);
+
+	//create chart labels dynamically, based on currentVariable/currentArray
+	var chartLabel = chartLabels.html(function(d) {
+		return currentArray[0]+"<br>"
+		+currentArray[1]+"<br>"
+		+currentArray[2]+"<br>"
+		+currentArray[3]+"<br>"
+		+currentArray[4]+"<br>";
+	});
 
 	//update chart title based on selected attribute
 	chartTitle.text(function(d) {
