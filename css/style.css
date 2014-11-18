@@ -18,10 +18,32 @@ body {
 	font-family: 'Montserrat', sans-serif;
 }
 
+/* SELECTED VARIABLE DESCRIPTION */ 
+
+.descriptionDiv {
+	width: 200px;
+	height: 500px;
+	padding-top: 20px;
+}
+
+.descriptionTitle {
+	margin-top: 40px;
+	font-family: 'Roboto Slab', serif;
+	font-weight: bold; 
+	color:#f7eb3e;
+}
+
+.description {
+	margin-top: 60px;
+	font-family: 'Roboto Slab', serif;
+	color:#f7eb3e;
+	word-wrap: break-word;
+}
+
 /* MAP + MAP ELEMENTS */ 
 .map {
-	margin-left: 20%;	
-	/*margin-top: 80px;*/
+	/*margin-left: 20%;*/	
+	margin-left: 300px;
 	position:absolute;
 }
 
@@ -41,14 +63,14 @@ body {
 	stroke-width: 0.5px;
 }
 
-/* CHART + CHART ELEMENTS*/
+/* CHART + CHART ELEMENTS */
 .chart {
 	background-color: #fff;
 	border: thick solid #fff;
 	margin-left: 24%;
 	margin-top: 370px;
 	margin-bottom: 50px;
-	position: relative;
+	position: absolute;
 }
 
 .chartTitle {
@@ -84,8 +106,7 @@ h3 {
 
 /* DROPDOWN MENU */
 .dropdown {
-/*	margin-left: 550px;
-	margin-top: -70px;*/
+	margin-top: 50px;
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -104,10 +125,9 @@ option {
 }
 
 /* PAGE DESCRIPTION AT BOTTOM OF PAGE */ 
-.description {
+.about {
 	color: #f7eb3e;
-	margin-top: 700px;
-	margin-left: 20px;
+	margin-top: 540px;
 	position: absolute;
 	font-family: 'Montserrat', sans-serif;
 	font-size: 20px;
