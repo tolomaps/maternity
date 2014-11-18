@@ -52,6 +52,7 @@ var chartTitle; //dynamic title for chart
 var chartLabels = []; //dynamic labels for chart
 var squareWidth = 10; //width of rects in chart (in pixels)
 var squareHeight = 25; //height of rects in chart (in pixels)
+var chart; //create chart
 var chartWidth = 900; //width of chart (in pixels)
 var chartHeight = (squareHeight*5)+5; //set chart container dimensions
 var scale; 
@@ -313,7 +314,7 @@ function choropleth(d, colorize){
 function setChart(maternityData, colorize) {
 
 	//create container for chart
-	var chart = d3.select("body")
+	chart = d3.select("body")
 		.append("svg")
 		.attr("width", chartWidth)
 		.attr("height", chartHeight)
@@ -354,20 +355,46 @@ function updateChart(squares, numSquares, maternityData){
 
 	//create chart labels dynamically, based on currentVariable/currentArray
 	var chartLabel = chartLabels.html(function(d) {
-		return currentArray[0]+"<br>"
-		+currentArray[1]+"<br>"
-		+currentArray[2]+"<br>"
-		+currentArray[3]+"<br>"
-		+currentArray[4]+"<br>";
+		if (currentVariable == "MaternalLeave") {
+			return currentArray[0]+"<br>"
+			+currentArray[1]+"<br>"
+			+currentArray[2]+"<br>"
+			+currentArray[3]+"<br>"
+			+currentArray[4]+"<br>";
+		} else if (currentVariable == "MaternalDeath") {
+			return "1:"+currentArray[0]+"<br>"
+			+"1:"+currentArray[1]+"<br>"
+			+"1:"+currentArray[2]+"<br>"
+			+"1:"+currentArray[3]+"<br>"
+			+"1:"+currentArray[4]+"<br>";
+		} else if (currentVariable == "FemaleLaborForceTotal") {
+			return currentArray[0]+"%"+"<br>"
+			+currentArray[1]+"%"+"<br>"
+			+currentArray[2]+"%"+"<br>"
+			+currentArray[3]+"%"+"<br>"
+			+currentArray[4]+"%"+"<br>";			
+		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
+			return currentArray[0]+"%"+"<br>"
+			+currentArray[1]+"%"+"<br>"
+			+currentArray[2]+"%"+"<br>"
+			+currentArray[3]+"%"+"<br>"
+			+currentArray[4]+"%"+"<br>";	
+		} else if (currentVariable == "FertilityRate") {
+			return currentArray[0]+"<br>"
+			+currentArray[1]+"<br>"
+			+currentArray[2]+"<br>"
+			+currentArray[3]+"<br>"
+			+currentArray[4]+"<br>";
+		}
 	});
 
 	//update chart title based on selected attribute
 	chartTitle.text(function(d) {
-		if (currentVariable == "MaternalLeave") { return title_MaternalLeave; }
-		if (currentVariable == "MaternalDeath") { return title_MaternalDeath; }
-		if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal; }
-		if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate; }
-		if (currentVariable == "FertilityRate") { return title_FertilityRate; } 
+		if (currentVariable == "MaternalLeave") { return title_MaternalLeave+" (Length of Paid Maternal Leave)"; }
+		else if (currentVariable == "MaternalDeath") { return title_MaternalDeath+" (Probability a woman will eventually die from a maternal cause)"; }
+		else if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal; }
+		else if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+" (Percentage of Women Ages 15+ Who Work)"; }
+		else if (currentVariable == "FertilityRate") { return title_FertilityRate+" (Average Number of Children per Woman)"; } 
 	});
 
 	//create object array to hold a count of how many countries are in each class
