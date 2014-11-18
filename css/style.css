@@ -1,12 +1,11 @@
 @charset "utf-8";
 /* CSS Document */
 
-/* MAIN PAGE ELEMENTS*/ 
-
 svg {
 	/*position: absolute;*/
 }
 
+/* MAIN PAGE ELEMENTS*/ 
 body {
 	background-image: url(gray_sand.png);
 	font-family: 'Roboto Slab', serif;
@@ -19,10 +18,32 @@ body {
 	font-family: 'Montserrat', sans-serif;
 }
 
-/* MAIN PAGE ELEMENTS*/ 
+/* SELECTED VARIABLE DESCRIPTION */ 
 
+.descriptionDiv {
+	width: 200px;
+	height: 500px;
+	padding-top: 20px;
+}
+
+.descriptionTitle {
+	margin-top: 40px;
+	font-family: 'Roboto Slab', serif;
+	font-weight: bold; 
+	color:#f7eb3e;
+}
+
+.description {
+	margin-top: 60px;
+	font-family: 'Roboto Slab', serif;
+	color:#f7eb3e;
+	word-wrap: break-word;
+}
+
+/* MAP + MAP ELEMENTS */ 
 .map {
-	margin-left: 20%;	
+	/*margin-left: 20%;*/	
+	margin-left: 300px;
 	position:absolute;
 }
 
@@ -42,15 +63,14 @@ body {
 	stroke-width: 0.5px;
 }
 
+/* CHART + CHART ELEMENTS */
 .chart {
 	background-color: #fff;
-	/*border: medium solid #999;*/
-	margin-left: 20px;
-	margin-top: 520px;
+	border: thick solid #fff;
+	margin-left: 24%;
+	margin-top: 370px;
 	margin-bottom: 50px;
-	position:absolute;
-	padding: 10px;
-	padding-left: 50px;
+	position: absolute;
 }
 
 .chartTitle {
@@ -58,9 +78,11 @@ body {
 	font-family: 'Montserrat', sans-serif;
 }
 
-.axis {
-	stroke:black;
+.chartLabel {
+
 }
+
+/* INFORMATION LABEL */ 
 
 .labelName {
 	font-weight: bold;
@@ -82,10 +104,9 @@ h3 {
 	font-weight: normal;
 }
 
+/* DROPDOWN MENU */
 .dropdown {
-	/*margin-left: 550px;
-	margin-top: -70px;*/
-	position:absolute;
+	margin-top: 50px;
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -103,10 +124,10 @@ option {
 	width: auto;
 }
 
-.description {
+/* PAGE DESCRIPTION AT BOTTOM OF PAGE */ 
+.about {
 	color: #f7eb3e;
-	margin-top: 700px;
-	margin-left: 20px;
+	margin-top: 540px;
 	position: absolute;
 	font-family: 'Montserrat', sans-serif;
 	font-size: 20px;
