@@ -52,18 +52,6 @@ var squareHeight = 25;
 var chartWidth = 900;
 var chartHeight = (squareHeight*5)+5; //set chart container dimensions
 var scale;
-var description; //description of selected variable
-
-// Create global title for each variable
-var title_MaternalLeave = "Maternity Leave Law";
-var title_MaternalDeath = "Lifetime Risk of Maternal Death";
-var title_FemaleLaborForceTotal = "Women as Percentage of Labor Force";
-var title_FemaleLaborForceParticipationRate = "Women Labor Force Participation Rate";
-var title_FertilityRate = "Fertility Rate"			
-
-
-// Create global descriptions for each variable
-var desc_MaternalLeave = "Workplace policies before and after childbirth - Length of Paid Maternal Leave";
 
 //Holds the current range of colors
 var range;
@@ -199,8 +187,7 @@ function setMap(){
 
 		createDropdown(maternityData);
 		setChart(maternityData, colorize); //create coordinated visualization
-		// createDescriptions(maternityData);
-		// about();
+		createDescriptions();
 		// zoom();
 	};
 };
@@ -221,17 +208,17 @@ function createDropdown(maternityData) {
 		.attr("value", function(d) { return d })
 		.text(function(d) {
 			if (d == "MaternalLeave") {
-				d = title_MaternalLeave;
+				d = "Maternity Leave Law";
 			} else if (d == "PaternalLeave") {
 				d = "Paternity Leave Law";
 			} else if (d == "MaternalDeath") {
-				d = title_MaternalDeath;
+				d = "Lifetime Risk of Maternal Death";
 			} else if (d == "FemaleLaborForceTotal") {
-				d = title_FemaleLaborForceTotal;
+				d = "Women as Percentage of Labor Force";
 			} else if (d == "FemaleLaborForceParticipationRate") {
-				d = title_FemaleLaborForceParticipationRate;
+				d = "Women Labor Force Participation Rate";
 			} else if (d == "FertilityRate") {
-				d = title_FertilityRate;
+				d = "Fertility Rate";
 			};
 			return d;
 		});
@@ -254,8 +241,8 @@ function changeAttribute(attribute, maternityData) {
 			});
 
 	var squares = d3.selectAll(".square");
+
 	updateChart(squares, maternityData.length, maternityData);
-	createDescriptions(maternityData);
 };
 
 function colorScale(maternityData) {
@@ -507,41 +494,13 @@ function moveLabel(maternityData) {
 		.style("margin-top", y+"px"); //reposition label vertical
 };
 
-function createDescriptions(maternityData) {
-	var descriptionDiv = d3.select("body")
-		.append("div")
-		.attr("class", "descriptionDiv");
-
-	descriptionTitle = descriptionDiv
-		.append("text")
-		.html(function(d) {
-			if (currentVariable == "MaternalLeave") { return title_MaternalLeave+"<br>" }
-			if (currentVariable == "MaternalDeath") { return title_MaternalDeath+"<br>"; }
-			if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal+"<br>"; }
-			if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+"<br>"; }
-			if (currentVariable == "FertilityRate") { return title_FertilityRate+"<br>"; } 
-		})
-		.attr("class", "descriptionTitle");
-
-	description = descriptionDiv
-		.append("text")
-		.text(function(d) {
-			if (currentVariable == "MaternalLeave") { return desc_MaternalLeave; }
-		})
-		.attr("class", "description");
-}
-
-function updateDescriptions(maternityData) {
-
-}
-
-function about() {
-	var about = d3.select("body")
+function createDescriptions() {
+	var description = d3.select("body")
 	.append("text")
 	.attr("x", 500)
 	.attr("y", 40)
 	.text("About this project:")
-	.attr("class", "about");
+	.attr("class", "description");
 }
 
 // function zoom() {
