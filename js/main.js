@@ -47,10 +47,7 @@ var currentColors = [];
 var jsonCountries;
 var colorize;
 var mapWidth = 1000, mapHeight = 500; //set map container dimensions
-var squareWidth = 10;
-var squareHeight = 25;
-var chartWidth = 900;
-var chartHeight = (squareHeight*5)+5; //set chart container dimensions
+var chartWidth = 1150, chartHeight = 100; //set chart container dimensions
 var scale;
 
 //Holds the current range of colors
@@ -172,8 +169,7 @@ function setMap(){
 			.on("mouseover", highlight)
 			.on("mouseout", dehighlight)
 			.on("mousemove", moveLabel)
-		
-		var countriesColor = countries.append("desc")
+			.append("desc")
 				.text(function(d) {
 					return choropleth(d, colorize);
 				});
@@ -276,7 +272,7 @@ function colorScale(maternityData) {
 		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
 			currentArray = [30, 50, 57, 65, 100];
 		} else if (currentVariable == "FertilityRate") {
-			currentArray = [1.5, 2, 3, 5, 8];
+			currentArray = [1.50001, 2, 3, 5, 8];
 		};
 	};
 	scale.domain(currentArray); //pass array of values as the domain
@@ -290,24 +286,26 @@ function choropleth(d, colorize){
 	//if the value exists, assign it a color; otherwise assign gray
 	if (value) {
 		return colorize(value);
-	} else if (value == "No data") {
-		return "#ccc";
 	} else {
 		return "#ccc";
-	}
+	};
 };
 
 function setChart(maternityData, colorize) {
 
 	//create container for chart
-	var chart = d3.select("body")
-		.append("svg")
+	var chartDiv = d3.select("body")
+		.append("div")
+		.attr("class", "chartDiv");
+
+	//create chart SVG
+	var chart = chartDiv.append("svg")
 		.attr("width", chartWidth)
 		.attr("height", chartHeight)
 		.attr("class", "chart");
 
 	//create chart title
-	var title = chart.append("text")
+	var title = chartDiv.append("text")
 		.attr("x", 20)
 		.attr("y", 40)
 		.attr("class", "chartTitle")
@@ -321,8 +319,8 @@ function setChart(maternityData, colorize) {
 		.attr("class", function(d){
 			return "square " + d.code3;
 		})
-		.attr("width", squareWidth+"px")
-		.attr("height", squareHeight+"px");
+		.attr("width", 13 + "px")
+		.attr("height", 13 + "px");
 
 	updateChart(squares, maternityData.length, maternityData);
 };
@@ -340,6 +338,7 @@ function updateChart(squares, numSquares, maternityData){
 	}
 
 	var squareColor = squares.style("fill", function(d) {
+			ifChart = true;
 			return choropleth(d, colorize);
 		})
 		.attr("x", function(d,i) {
@@ -347,7 +346,7 @@ function updateChart(squares, numSquares, maternityData){
 			//for loop arranges each class so that the squares are contiguous horizontally
 			for (i = 0; i < colorObjectArray.length; i++) {
 				if (colorObjectArray[i].color == color) {
-					xValue = colorObjectArray[i].count*(squareWidth+1);
+					xValue = colorObjectArray[i].count*14;
 					colorObjectArray[i].count+=1;
 				}
 				if (color == "#ccc" || color == undefined) {
@@ -362,15 +361,15 @@ function updateChart(squares, numSquares, maternityData){
 			if (color == currentColors[0]) {
 				return 0
 			} else if (color == currentColors[1]) {
-				return (squareHeight+1);
+				return 14;
 			} else if (color == currentColors[2]) {
-				return (squareHeight+1)*2;
+				return 14*2;
 			} else if (color == currentColors[3]) {
-				return (squareHeight+1)*3;
+				return 14*3;
 			} else if (color == currentColors[4]) {
-				return (squareHeight+1)*4;
+				return 14*4;
 			} else if (color == currentColors[5]) {
-				return (squareHeight+1)*5;
+				return 14*5;
 			}
 		})
 		.on("mouseover", highlightChart)
@@ -476,10 +475,11 @@ function dehighlight(maternityData) {
 	console.log(selection);
 
 	var fillColor = selection.select("desc").text();
-	console.log(fillColor);
 	selection.style("fill", fillColor);
+	console.log(fillColor);
 	
 	var deselect = d3.select("#"+properties.code3+"label").remove(); //remove info label
+	console.log(deselect);
 };
 
 function moveLabel(maternityData) {
