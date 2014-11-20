@@ -82,13 +82,14 @@ body {
 }
 
 .chartLabels {
-	margin-top: 470px;
-	margin-left: 165px;
-	line-height: 160%;
-	color:#f7eb3e;
-	font-family: 'Roboto Slab', serif;
-	position: absolute;
-	text-align:right;
+    color: #f7eb3e;
+    font-family: "Roboto Slab",serif;
+    line-height: 160%;
+    margin-left: 150px;
+    margin-top: 465px;
+    position: absolute;
+    text-align: right;
+    width: 155px;
 }
 
 /* INFORMATION LABEL */ 

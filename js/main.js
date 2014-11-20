@@ -154,12 +154,12 @@ function setMap(){
 						//for the Fertility Rate, round to one decimal point
 						} else if (keyArray[key] == "FertilityRate") {
 							var attribute = keyArray[key];
-							var value = Math.round(csvCountry[attribute]*10)/10;
+							var value = csvCountry[attribute];
 							jsonCountries[j].properties[attribute] = value;
 						} else {
 						//else, round to nearest integer, and attach CSV data to json object
 							var attribute = keyArray[key];
-							var value = Math.round(parseFloat(csvCountry[attribute]));
+							var value = parseFloat(csvCountry[attribute]);
 							jsonCountries[j].properties[attribute] = value;
 							// console.log(jsonCountries[j]);
 						};
@@ -212,7 +212,7 @@ function createDropdown(maternityData) {
 	var dropdown = d3.select("body")
 		.append("div")
 		.attr("class", "dropdown")
-		.html("<h3>Select a Statistic:</h3>")
+		.html("<h3>Select an Indicator:</h3>")
 		.append("select")
 		.on("change", function() { changeAttribute(this.value, maternityData) } );
 
@@ -327,8 +327,6 @@ function setChart(maternityData, colorize) {
 
 	chartLabels = d3.select("body")
 		.append("div")
-		.attr("width", 100)
-		.attr("height", chartHeight)
 		.attr("class", "chartLabels");
 
 	//append squares to the chart, one square to represent each country
