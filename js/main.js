@@ -435,52 +435,10 @@ function updateChart(squares, numSquares, maternityData){
 				return (squareHeight+1)*5;
 			}
 		})
-		.on("mouseover", highlightChart)
+		.on("mouseover", highlight)
 		.on("mouseout", dehighlight)
 		.on("mousemove", moveLabel);
 	};
-
-function highlightChart(maternityData) {
-	var properties = maternityData.properties ? maternityData.properties : maternityData;
-	
-	d3.selectAll("."+properties.code3)
-		.style("fill", "#f7eb3e");
-
-	var labelAttribute = properties[currentVariable]+"<br>"+currentVariable;
-
-	var labelName;
-	if (properties.name_long == undefined) {
-		labelName = properties.Country;
-	} else {
-		labelName = properties.name_long;
-	}
-	
-	if (Boolean(properties[currentVariable]) == true) {
-		if (currentVariable == "MaternalLeave") {
-			labelAttribute = properties[currentVariable];
-		} else if (currentVariable == "MaternalDeath") {
-			labelAttribute = "1 in "+properties[currentVariable]+"<br>women die from maternal causes"
-		} else if (currentVariable == "FemaleLaborForceTotal") {
-			labelAttribute = Math.round(properties[currentVariable])+"% of the labor force is composed of women"
-		} else if (currentVariable == "FemaleLaborForceParticipationRate") {
-			labelAttribute = Math.round(properties[currentVariable])+"% of women work"
-		} else if (currentVariable == "FertilityRate") {
-			labelAttribute = Math.round(properties[currentVariable]*10)/10+"<br>Average Number of Children Per Woman"
-		};
-	} else { //if no data associated with selection, display "No data"
-		labelAttribute = "No data";
-	};
-
-	var infoLabel = d3.select("body")
-		.append("div")
-		.attr("class", "infoLabel")
-		.attr("id",properties.code3+"label")
-		.html(labelName)
-		.append("div")
-		.html(labelAttribute)
-		.attr("class", "labelName");	
-}
-
 
 function highlight(maternityData) {
 	var properties = maternityData.properties ? maternityData.properties : maternityData;
