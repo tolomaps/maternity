@@ -5,6 +5,26 @@ svg {
 	position: absolute;
 }
 
+
+/* Link styling */
+
+a:link, a:visited {
+    color: #bcbddc;
+}
+
+a:hover {
+    color: #756bb1;
+}
+
+::selection {
+    background-color: #fca18c; 
+    color: #fff;
+}
+::-moz-selection {
+    background-color: #fca18c; 
+    color: #fff;
+}
+
 /* MAIN PAGE ELEMENTS*/ 
 body {
 	background-image: url(gray_sand.png);
@@ -21,16 +41,19 @@ body {
 /* SELECTED VARIABLE DESCRIPTION */ 
 
 .descriptionDiv {
-	width: 200px;
 	height: 500px;
 	padding-top: 20px;
+	position: absolute;
 }
 
 .descriptionTitle {
-	margin-top: 40px;
+	margin-top: 150px;
+	width: 265px;
 	font-family: 'Roboto Slab', serif;
-	font-weight: bold; 
+	font-size:20px;
+	font-weight: normal; 
 	color:#f7eb3e;
+	position: absolute;
 }
 
 .description {
@@ -38,6 +61,10 @@ body {
 	font-family: 'Roboto Slab', serif;
 	color:#f7eb3e;
 	word-wrap: break-word;
+	font-size:16px;
+	color: #eee;
+	line-height: 13px;
+	/*position: absolute;*/
 }
 
 /* MAP + MAP ELEMENTS */ 
@@ -68,7 +95,7 @@ body {
 	background-color: #fff;
 	border: thick solid #fff;
 	/*margin-left: 200px;*/
-	margin-top: 500px;
+	margin-top: 480px;
 	position: absolute;
 }
 
@@ -86,10 +113,11 @@ body {
     font-family: "Roboto Slab",serif;
     line-height: 160%;
     margin-left: 155px;
-    margin-top: 473px;
+    margin-top: 453px;
     position: absolute;
     text-align: right;
     width: 155px;
+    font-size:16px;
 }
 
 /* INFORMATION LABEL */ 
@@ -138,8 +166,29 @@ option {
 /* PAGE DESCRIPTION AT BOTTOM OF PAGE */ 
 .about {
 	color: #f7eb3e;
-	margin-top: 540px;
+	margin-top: 600px;
+	margin-left:2%;
+	margin-right:2%;
 	position: absolute;
 	font-family: 'Montserrat', sans-serif;
 	font-size: 20px;
+	font-weight: normal;
+	color: #ddd;
+}
+/*
+.aboutTitle {
+	color: #f7eb3e;
+	margin-top: 700px;
+	position: absolute;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 20px;
+}*/
+
+.aboutText {
+	color: #eee;
+	font-size: 16px;
+}
+
+.sources {
+	font-size: 14px;
 }

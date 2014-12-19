@@ -22,11 +22,11 @@ ordinalColorArray = [ "#fb6a4a",	//no paid leave
 				  "#ccc"	]; 	//no data
 
 //color array for maternal death
-deathColorArray = [	"#54278f",
-				"#756bb1",
-				"#9e9ac8",
-				"#bcbddc",
-				"#dadaeb"	];
+deathColorArray = [	"#a82204",
+					"#eb2f05",
+					"#fb6a4a",
+					"#fca18c",
+					"#fed7cf"	];
 
 //array to hold colors for all other variables				
 colorArray = [	"#dadaeb",
@@ -65,9 +65,15 @@ var title_FemaleLaborForceTotal = "Women as Percentage of Labor Force";
 var title_FemaleLaborForceParticipationRate = "Women Labor Force Participation Rate";
 var title_FertilityRate = "Fertility Rate"			
 
+//Create the description container
+var descriptionDiv;
+
 // Create global descriptions for each variable
-var desc_MaternalLeave = "Workplace policies before and after childbirth - Length of Paid Maternal Leave";
-var desc_MaternalDeath = "Life time risk of maternal death is the probability that a 15-year-old female will die eventually from a maternal cause assuming that current levels of fertility and mortality (including maternal mortality) do not change in the future, taking into account competing causes of death."
+var desc_MaternalLeave = "Length of paid maternal leave<sup>[1]</sup>";
+var desc_MaternalDeath = "The probability that a 15-year-old female will die eventually from a maternal cause assuming that current levels of fertility and mortality (including maternal mortality) do not change in the future, taking into account competing causes of death.<sup>[2]</sup>"
+var desc_FemaleLaborForceTotal = "Shows the extent to which women are active in the labor force. Labor force comprises people ages 15 and older who meet the International Labour Organization's definition of the economically active population.<sup>[2]</sup>";
+var desc_FemaleLaborForceParticipationRate = "Proportion of the female population ages 15 and older that is economically active: all people who supply labor for the production of goods and services during a specified period<sup>[2]</sup>";
+var desc_FertilityRate = "Represents the number of children that would be born to a woman if she were to live to the end of her childbearing years and bear children in accordance with current fertility rates.<sup>[2]</sup>"		
 //Holds the current range of colors
 var range;
 
@@ -201,8 +207,8 @@ function setMap(){
 
 		createDropdown(maternityData);
 		setChart(maternityData, colorize); //create coordinated visualization
-		// createDescriptions(maternityData);
-		// about();
+		createDescriptions(maternityData);
+		about();
 		// zoom();
 	};
 };
@@ -257,7 +263,7 @@ function changeAttribute(attribute, maternityData) {
 
 	var squares = d3.selectAll(".square");
 	updateChart(squares, maternityData.length, maternityData);
-	// createDescriptions(maternityData);
+	updateDescriptions(maternityData);
 };
 
 function colorScale(maternityData) {
@@ -349,8 +355,6 @@ function updateChart(squares, numSquares, maternityData){
 	var yValue = 0;
 	var colorObjectArray = [];
 
-	console.log(currentArray);
-
 	//create chart labels dynamically, based on currentVariable/currentArray
 	var chartLabel = chartLabels.html(function(d) {
 		if (currentVariable == "MaternalLeave") {
@@ -387,13 +391,13 @@ function updateChart(squares, numSquares, maternityData){
 	});
 
 	//update chart title based on selected attribute
-	chartTitle.text(function(d) {
-		if (currentVariable == "MaternalLeave") { return title_MaternalLeave+" (Length of Paid Maternal Leave)"; }
-		else if (currentVariable == "MaternalDeath") { return title_MaternalDeath+" (Probability a woman will eventually die from a maternal cause)"; }
-		else if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal; }
-		else if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+" (Percentage of Women Ages 15+ Who Work)"; }
-		else if (currentVariable == "FertilityRate") { return title_FertilityRate+" (Average Number of Children per Woman)"; } 
-	});
+	// chartTitle.text(function(d) {
+	// 	if (currentVariable == "MaternalLeave") { return title_MaternalLeave+" (Length of Paid Maternal Leave)"; }
+	// 	else if (currentVariable == "MaternalDeath") { return title_MaternalDeath+" (Probability a woman will eventually die from a maternal cause)"; }
+	// 	else if (currentVariable == "FemaleLaborForceTotal") { return title_FemaleLaborForceTotal; }
+	// 	else if (currentVariable == "FemaleLaborForceParticipationRate") { return title_FemaleLaborForceParticipationRate+" (Percentage of Women Ages 15+ Who Work)"; }
+	// 	else if (currentVariable == "FertilityRate") { return title_FertilityRate+" (Average Number of Children per Woman)"; } 
+	// });
 
 	//create object array to hold a count of how many countries are in each class
 	for (i = 0; i < currentColors.length; i++) {
@@ -506,12 +510,16 @@ function moveLabel(maternityData) {
 };
 
 function createDescriptions(maternityData) {
-	var descriptionDiv = d3.select("body")
+
+	descriptionDiv = d3.select("body")
 		.append("div")
 		.attr("class", "descriptionDiv");
 
+	updateDescriptions(maternityData);
+}
+
+function updateDescriptions(maternityData) {
 	descriptionTitle = descriptionDiv
-		.append("text")
 		.html(function(d) {
 			if (currentVariable == "MaternalLeave") { return title_MaternalLeave+"<br>" }
 			if (currentVariable == "MaternalDeath") { return title_MaternalDeath+"<br>"; }
@@ -521,52 +529,34 @@ function createDescriptions(maternityData) {
 		})
 		.attr("class", "descriptionTitle");
 
-	description = descriptionDiv
-		.append("text")
-		.text(function(d) {
+	description = descriptionDiv.append("text")
+		.html(function(d) { 
 			if (currentVariable == "MaternalLeave") { return desc_MaternalLeave; }
+			if (currentVariable == "MaternalDeath") { return desc_MaternalDeath; }
+			if (currentVariable == "FemaleLaborForceTotal") { return desc_FemaleLaborForceTotal; } desc_FemaleLaborForceTotal
+			if (currentVariable == "FemaleLaborForceParticipationRate") { return desc_FemaleLaborForceParticipationRate; }
+			if (currentVariable == "FertilityRate") { return desc_FertilityRate; } 
 		})
 		.attr("class", "description");
 }
 
-function updateDescriptions(maternityData) {
-
-}
-
 function about() {
+
 	var about = d3.select("body")
-	.append("text")
-	.attr("x", 500)
-	.attr("y", 40)
-	.text("About this project:")
-	.attr("class", "about");
+		.append("div")
+		.attr("class", "about")
+		.html("About: <br>")
+		.append("div")
+		.html(
+			"This website was created by Robin Tolochko in Fall 2014 | <a href='http://www.tolomaps.com' target='_blank'>Website</a> | <a href='http://www.twitter.com/tolomaps' target='_blank'>Twitter</a><br>"
+			+"<br>I was initially inspired to map these topics by this <a href='http://www.nytimes.com/imagepages/2013/02/17/opinion/17coontz2-map.html' target='_blank'>NYTimes map</a> of maternity leave policies worldwide, which was published right before I got pregnant. It seemed odd that, as a working woman, Bogota, Colombia (where I was living at the time) was a better place to have a kid than the United States."
+			+"<br><br>I am under no illusion that the maternal leave map is indicative of the actual situation in each country; I am aware that in many countries, the official policy may be that women get paid maternal leave, but the reality is that many women don't have formal employment or may not qualify for other reasons. This is a subject I'd like to explore further."
+			+"<br><br>The Maternal Death indicator shocked me. In too many countries, the rate is higher than 1:50, meaning that 1 in 50 women will die from some maternal cause. I cannot fathom this.")
+		.attr("class", "aboutText");
+
+	var sources = d3.select(".about")
+		.append("text")
+		.html(
+			"<br><br><sup>[1]</sup>Data for Maternity Leave Law (Year Unknown) is from the <a href='http://worldpolicyforum.org/tables/workplace-policies-childbirth/' target='_blank'>World Policy Forum</a>"+"<br>"+"<sup>[2]</sup>All other data is from the <a href='http://data.worldbank.org/indicator' target='_blank'>World Bank</a>: Lifetime Risk of Maternal Death (2013), Women as Percentage of Labor Force (2012), Women Labor Force Participation Rate (2012), and Fertility Rate (2012)")
+		.attr("class", "sources")
 }
-
-// function zoom() {
-// 	var zoom = d3.behavior.zoom()
-// 	    	.translate([0, 0])
-// 	    	.scale(1)
-// 	    	.scaleExtent([1, 8])
-// 	    	.on("zoom", zoomed);
-
-// 	var background = d3.select(".map")
-// 		.append("rect")
-// 	    	.attr("class", "background")
-// 	    	.attr("width", mapWidth)
-// 	    	.attr("height", mapHeight)
-// 	    	.on("click", reset);
-
-// 	function reset() {
-// 		active.classed("active", false);
-// 		active = d3.select(null);
-
-// 		svg.transition()
-// 		    .duration(750)
-// 		    .call(zoom.translate([0, 0]).scale(1).event);
-// 		}
-
-// 	function zoomed() {
-// 		g.style("stroke-width", 1.5 / d3.event.scale + "px");
-// 		g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-// 	};
-// };
