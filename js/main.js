@@ -549,9 +549,7 @@ function about() {
 		.append("div")
 		.html(
 			"This website was created by Robin Tolochko in Fall 2014 | <a href='http://www.tolomaps.com' target='_blank'>Website</a> | <a href='http://www.twitter.com/tolomaps' target='_blank'>Twitter</a><br>"
-			+"<br>I was initially inspired to map these topics by this <a href='http://www.nytimes.com/imagepages/2013/02/17/opinion/17coontz2-map.html' target='_blank'>NYTimes map</a> of maternity leave policies worldwide, which was published right before I got pregnant. It seemed odd that, as a working woman, Bogota, Colombia (where I was living at the time) was a better place to have a kid than the United States."
-			+"<br><br>I am under no illusion that the maternal leave map is indicative of the actual situation in each country; I am aware that in many countries, the official policy may be that women get paid maternal leave, but the reality is that many women don't have formal employment or may not qualify for other reasons. This is a subject I'd like to explore further."
-			+"<br><br>The Maternal Death indicator shocked me. In too many countries, the rate is higher than 1:50, meaning that 1 in 50 women will die from some maternal cause. I cannot fathom this.")
+			+"Brief writeup of the project on my portfolio, <a href='http://tolomaps.com/portfolio/modern-motherhood-a-world-of-struggle/'>here</a>.")
 		.attr("class", "aboutText");
 
 	var sources = d3.select(".about")
